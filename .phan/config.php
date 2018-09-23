@@ -7,6 +7,7 @@ return [
     'directory_list' => [
         'src/',
         'vendor/kahlan/kahlan/src',
+        'vendor/vanilla/garden-cli/src',
         'vendor/jms/serializer/src'
     ],
 

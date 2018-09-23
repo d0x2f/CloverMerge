@@ -89,11 +89,11 @@ class Document
         $xml_document->formatOutput = true;
 
         $xml_coverage = $xml_document->createElement('coverage');
-        $xml_coverage->setAttribute('generated', (int)$_SERVER['REQUEST_TIME']);
+        $xml_coverage->setAttribute('generated', $_SERVER['REQUEST_TIME']);
         $xml_document->appendChild($xml_coverage);
 
         $xml_project = $xml_document->createElement('project');
-        $xml_project->setAttribute('timestamp', (int)$_SERVER['REQUEST_TIME']);
+        $xml_project->setAttribute('timestamp', $_SERVER['REQUEST_TIME']);
         $xml_coverage->appendChild($xml_project);
 
         $packages = new \Ds\Map();

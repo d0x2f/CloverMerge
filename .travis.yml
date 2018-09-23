@@ -1,0 +1,19 @@
+language: php
+php:
+  - '7.2'
+  - nightly
+cache:
+  directories:
+  - vendor
+matrix:
+  allow_failures:
+  - php: nightly
+install:
+  - curl -s http://getcomposer.org/installer | php
+  - php composer.phar install --dev --no-interaction
+script:
+  - php composer.phar run test
+  - php composer.phar run phan
+  - php composer.phar run sniff
+after_success:
+  - travis_retry php vendor/bin/php-coveralls

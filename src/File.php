@@ -106,7 +106,7 @@ class File
      * Add or merge class.
      *
      * @param string $name
-     * @param Class $class
+     * @param ClassT $class
      * @return void
      */
     public function mergeClass(string $name, ClassT $class) : void

@@ -1,5 +1,9 @@
 # CloverMerge
 
+[![Build Status](https://travis-ci.org/d0x2f/CloverMerge.svg?branch=master)](https://travis-ci.org/d0x2f/CloverMerge)
+
+[![Coverage Status](https://coveralls.io/repos/github/d0x2f/CloverMerge/badge.svg?branch=master)](https://coveralls.io/github/d0x2f/CloverMerge?branch=master)
+
 PHP utility to merge two or more clover files into a single document.
 
 Intended to be used in a build pipeline to merge clover output from multiple testing frameworks.

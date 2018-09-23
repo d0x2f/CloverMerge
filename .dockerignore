@@ -8,3 +8,5 @@ README.md
 Dockerfile
 kahlan-config.php
 .dockerignore
+phpcs.xml
+.travis.yml

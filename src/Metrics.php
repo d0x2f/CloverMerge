@@ -17,7 +17,7 @@ class Metrics
     /**
      * Constructor.
      *
-     * @param string $properties
+     * @param \Ds\Map $properties
      */
     public function __construct(\Ds\Map $properties)
     {

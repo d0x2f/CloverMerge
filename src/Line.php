@@ -18,7 +18,7 @@ class Line
      * Other properties on the line.
      * E.g. name, visibility, complexity, crap.
      *
-     * @param \Ds\Map $properties
+     * @var \Ds\Map $properties
      */
     private $properties;
 
