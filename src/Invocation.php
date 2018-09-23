@@ -43,7 +43,7 @@ class Invocation
         $this->output_path = $arguments->getOpt('output');
 
         // Using a set removes duplicates
-        $paths = new \Ds\Set($arguments->getArgs());
+        $paths = new \Ds\Set(array_values($arguments->getArgs()));
 
         if ($paths->count() === 0) {
             throw new ArgumentException('At least one input path is required (preferably two).');

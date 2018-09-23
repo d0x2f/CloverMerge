@@ -2,18 +2,23 @@ language: php
 php:
   - '7.2'
   - nightly
+branches:
+  only:
+    - master
 cache:
   directories:
-  - vendor
+    - vendor
 matrix:
   allow_failures:
-  - php: nightly
+     php: nightly
+before_install:
+  - ./travis-setup.sh
+  - mkdir -p test_output
 install:
-  - curl -s http://getcomposer.org/installer | php
-  - php composer.phar install --dev --no-interaction
+  - composer install --dev --no-interaction
 script:
-  - php composer.phar run test
-  - php composer.phar run phan
-  - php composer.phar run sniff
+  - composer run test
+  - composer run phan
+  - composer run sniff
 after_success:
   - travis_retry php vendor/bin/php-coveralls

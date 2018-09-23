@@ -10,3 +10,4 @@ kahlan-config.php
 .dockerignore
 phpcs.xml
 .travis.yml
+travis-setup.sh
