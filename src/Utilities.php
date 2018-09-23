@@ -9,11 +9,13 @@ class Utilities
 {
     /**
      * Verify that each file in the given set exists.
+     * Awaiting ds release to be able to use \Ds\Set.
+     * https://github.com/php-ds/extension/commit/ae9ce662360e9f93b4b6c7abb78b938672be1abc
      *
-     * @param \Ds\Set $paths
+     * @param \Ds\Vector $paths
      * @return boolean
      */
-    public static function filesExist(\Ds\Set $paths) : bool
+    public static function filesExist(\Ds\Vector $paths) : bool
     {
         return $paths->reduce(
             function (bool $carry, string $path) : bool {
