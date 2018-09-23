@@ -12,12 +12,12 @@
     ],
     "require": {
         "jms/serializer": "^1.13",
-        "phan/phan": "^1.0",
         "vanilla/garden-cli": "^2.1",
         "php-ds/php-ds": "^1.2"
     },
     "require-dev": {
         "kahlan/kahlan": "^4.2",
+        "phan/phan": "^1.0",
         "squizlabs/php_codesniffer": "^3.3",
         "php-coveralls/php-coveralls": "^2.1"
     },
