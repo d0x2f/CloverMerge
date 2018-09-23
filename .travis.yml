@@ -18,4 +18,4 @@ script:
   - composer run phan
   - composer run sniff
 after_success:
-  - travis_retry php vendor/bin/php-coveralls --coverage_clover=test_output/clover_kahlan.xml
+  - travis_retry php vendor/bin/php-coveralls --coverage_clover=test_output/clover_kahlan.xml --json_path=test_output/
