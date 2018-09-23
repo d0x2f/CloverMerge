@@ -19,7 +19,7 @@ class Invocation
     /**
      * Parsed input XML documents.
      *
-     * @var \Ds\Set
+     * @var \Ds\Vector
      */
     private $documents;
 

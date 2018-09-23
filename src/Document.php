@@ -10,10 +10,10 @@ class Document
     /**
      * Parse the given documents into a map of files and metrics.
      *
-     * @param \Ds\Set $documents
+     * @param \Ds\Vector $documents
      * @return \Ds\Map
      */
-    public static function parseSet(\Ds\Set $documents) : \Ds\Map
+    public static function parseSet(\Ds\Vector $documents) : \Ds\Map
     {
         return $documents->reduce(
             function (\Ds\Map $items, \SimpleXMLElement $document) {
