@@ -57,12 +57,12 @@ class Invocation
         }
 
         $this->documents = $paths->map(function ($path) {
-            return simplexml_load_file($path);
+            $document = simplexml_load_file($path);
+            if ($document === false) {
+                throw new ArgumentException("Unable to parse one or more of the input files.");
+            }
+            return $document;
         });
-
-        if ($this->documents->contains(false)) {
-            throw new ArgumentException("Unable to parse one or more of the input files.");
-        }
     }
 
     public function execute() : void
