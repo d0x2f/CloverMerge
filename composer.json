@@ -33,5 +33,8 @@
     },
     "suggest": {
         "ext-ds": "to improve performance and reduce memory usage"
-    }
+    },
+    "bin": [
+        "clover-merge"
+    ]
 }

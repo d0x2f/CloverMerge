@@ -2,7 +2,7 @@
 <ruleset name="Snout">
   <file>src</file>
   <file>spec</file>
-  <file>clover-merge.php</file>
+  <file>clover-merge</file>
 
   <arg name="basepath" value="."/>
   <arg name="colors" />
