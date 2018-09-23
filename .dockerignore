@@ -1,0 +1,10 @@
+vendor/
+.vscode/
+.phan/
+spec/
+LICENSE
+README.md
+.gitignore
+Dockerfile
+kahlan-config.php
+.dockerignore

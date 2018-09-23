@@ -1,0 +1,30 @@
+{
+    "name": "dylan/php-model-renderer",
+    "description": "Merge two or more clover XML files.",
+    "type": "project",
+    "version": "1.0.0",
+    "require-dev": {
+        "kahlan/kahlan": "^4.2"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dylan McGannon",
+            "email": "me@dyl.dog"
+        }
+    ],
+    "require": {
+        "jms/serializer": "^1.13",
+        "phan/phan": "^1.0",
+        "vanilla/garden-cli": "^2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "d0x2f\\CloverMerge\\": "src/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/kahlan",
+        "phan": "./vendor/bin/phan"
+    }
+}
