@@ -8,7 +8,8 @@ return [
         'src/',
         'vendor/kahlan/kahlan/src',
         'vendor/vanilla/garden-cli/src',
-        'vendor/jms/serializer/src'
+        'vendor/jms/serializer/src',
+        'vendor/php-ds/php-ds/src'
     ],
 
     "exclude_analysis_directory_list" => [
