@@ -1,16 +1,13 @@
 language: php
 php:
+  - '7.1'
   - '7.2'
-  - nightly
 branches:
   only:
     - master
 cache:
   directories:
     - vendor
-matrix:
-  allow_failures:
-     php: nightly
 before_install:
   - ./travis-setup.sh
   - mkdir -p test_output
@@ -21,4 +18,4 @@ script:
   - composer run phan
   - composer run sniff
 after_success:
-  - travis_retry php vendor/bin/php-coveralls
+  - travis_retry php vendor/bin/php-coveralls --coverage_clover=test_output/clover_kahlan.xml
