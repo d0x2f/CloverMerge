@@ -9,10 +9,16 @@ Intended to be used in a build pipeline to merge clover output from multiple tes
 
 I spent a weekend writting this so you don't have to.
 
+# Install
+
+```
+$ composer require d0x2f/clover-merge
+```
+
 # Usage
 
 ```
-usage: clover-merge.php [<options>] [<args>]
+usage: clover-merge [<options>] [<args>]
 
 OPTIONS
   --help, -?     Display this help.
@@ -25,5 +31,5 @@ ARGUMENTS
 # Example
 
 ```bash
-$ php clover-merge.php -o combined.xml input1.xml input2.xml
+$ ./vendor/bin/clover-merge -o combined.xml input1.xml input2.xml
 ```
