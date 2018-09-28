@@ -7,7 +7,7 @@ PHP utility to merge two or more clover files into a single document.
 
 Intended to be used in a build pipeline to merge clover output from multiple testing frameworks.
 
-I spent a weekend writting this so you don't have to.
+I spent a weekend writing this so you don't have to.
 
 # Install
 

@@ -22,7 +22,9 @@ class Document
                 }
                 $projects = $document->children();
                 foreach ($projects as $project) {
-                    if ($project->getName() !== 'project') {
+                    $name = $project->getName();
+                    if ($name !== 'project') {
+                        Utilities::logWarning("Ignoring unknown element: {$name}.");
                         continue;
                     }
                     self::parseItems($items, $project->children());
@@ -41,8 +43,11 @@ class Document
      * @param string|null $package_name The package name new files should be given.
      * @return void
      */
-    private function parseItems(\Ds\Map &$items, \SimpleXMLElement $elements, ?string $package_name = null) : void
-    {
+    private static function parseItems(
+        \Ds\Map &$items,
+        \SimpleXMLElement $elements,
+        ?string $package_name = null
+    ) : void {
         foreach ($elements as $element) {
             $name = $element->getName();
             $attributes = iterator_to_array($element->attributes());

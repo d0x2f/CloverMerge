@@ -2,7 +2,7 @@ vendor/
 .vscode/
 .phan/
 spec/
-LICENSE
+test_output/
 README.md
 .gitignore
 Dockerfile

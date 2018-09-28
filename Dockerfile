@@ -8,8 +8,8 @@ ENV COMPOSER_ALLOW_SUPERUSER 1
 
 COPY composer.json composer.lock ./
 
-RUN composer install
+RUN composer install --no-dev --no-suggest --no-interaction
 
 COPY . ./
 
-CMD [ "/usr/local/bin/php", "clover-merge.php" ]
+ENTRYPOINT [ "./clover-merge" ]

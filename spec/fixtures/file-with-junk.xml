@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage>
+    <bogus/>
+    <project>
+        <dinosaurs>
+            <dinosaur name="Tyrannosaurus"/>
+            <dinosaur name="Velociraptor"/>
+            <dinosaur name="Spinosaurus"/>
+        </dinosaurs>
+        <package name="test">
+            <folder name="test folder"/>
+            <file name="test.php">
+                <line num="1" type="method" name="__construct" visibility="public" complexity="1" crap="2.00" count="0"/>
+                <line num="2" type="stmt" count="1"/>
+                <line num="3" type="stmt" count="2"/>
+                <line num="4" type="stmt" count="3"/>
+                <line num="5" type="stmt" count="4"/>
+            </file>
+        </package>
+    </project>
+    <project/>
+</coverage>

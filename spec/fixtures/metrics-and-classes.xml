@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1537585816">
+  <project timestamp="1537585816">
+    <package name="Example\Namespace">
+      <file name="/src/Example/Namespace/Class.php">
+        <class name="Example\Namespace\Class" namespace="Example\Namespace">
+          <metrics complexity="7" methods="1" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="15" coveredstatements="9" elements="16" coveredelements="9"/>
+        </class>
+        <line num="22" type="method" name="__construct" visibility="public" complexity="7" crap="10.14" count="1"/>
+        <line num="28" type="stmt" count="1"/>
+        <line num="29" type="stmt" count="0"/>
+        <line num="31" type="stmt" count="0"/>
+        <line num="32" type="stmt" count="0"/>
+        <line num="35" type="stmt" count="1"/>
+        <line num="36" type="stmt" count="0"/>
+        <line num="37" type="stmt" count="1"/>
+        <line num="38" type="stmt" count="0"/>
+        <line num="39" type="stmt" count="1"/>
+        <line num="40" type="stmt" count="0"/>
+        <line num="43" type="stmt" count="1"/>
+        <line num="44" type="stmt" count="1"/>
+        <line num="45" type="stmt" count="1"/>
+        <line num="49" type="stmt" count="1"/>
+        <line num="50" type="stmt" count="1"/>
+        <metrics loc="51" ncloc="37" classes="1" methods="1" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="15" coveredstatements="9" elements="16" coveredelements="9"/>
+      </file>
+    </package>
+  </project>
+</coverage>
