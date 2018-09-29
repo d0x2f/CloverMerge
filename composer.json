@@ -19,7 +19,8 @@
         "kahlan/kahlan": "^4.2",
         "phan/phan": "^1.0",
         "squizlabs/php_codesniffer": "^3.3",
-        "php-coveralls/php-coveralls": "^2.1"
+        "php-coveralls/php-coveralls": "^2.1",
+        "sebastianfeldmann/captainhook": "^2.1"
     },
     "autoload": {
         "psr-4": {
@@ -27,9 +28,10 @@
         }
     },
     "scripts": {
-        "test": "vendor/bin/kahlan",
+        "test": "./vendor/bin/kahlan",
         "phan": "./vendor/bin/phan",
-        "sniff": "./vendor/bin/phpcs"
+        "sniff": "./vendor/bin/phpcs",
+        "post-install-cmd": "\\SebastianFeldmann\\CaptainHook\\Composer\\Cmd::install"
     },
     "suggest": {
         "ext-ds": "to improve performance and reduce memory usage"

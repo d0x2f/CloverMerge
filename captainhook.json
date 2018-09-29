@@ -1,0 +1,24 @@
+{
+  "commit-msg": {
+    "enabled": false,
+    "actions": []
+  },
+  "pre-commit": {
+    "enabled": true,
+    "actions": [
+      {
+        "action": "composer run sniff"
+      },
+      {
+        "action": "composer run phan"
+      },
+      {
+        "action": "composer run test"
+      }
+    ]
+  },
+  "pre-push": {
+    "enabled": false,
+    "actions": []
+  }
+}
