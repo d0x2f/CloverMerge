@@ -25,5 +25,6 @@
         <metrics loc="51" ncloc="37" classes="1" methods="1" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="15" coveredstatements="9" elements="16" coveredelements="9"/>
       </file>
     </package>
+    <metrics loc="719" ncloc="578" statements="141" coveredstatements="138"/>
   </project>
 </coverage>

@@ -41,13 +41,14 @@ class Line
      */
     public static function fromXML(\SimpleXMLElement $xml) : Line
     {
-        $attributes = iterator_to_array($xml->attributes());
-        if (!array_key_exists('count', $attributes)) {
+        $properties = new \Ds\Map($xml->attributes());
+        $properties->apply(function ($key, $value) {
+            return (string) $value;
+        });
+        if (!$properties->hasKey('count')) {
             throw new ParseException('Unable to parse line, missing count attribute.');
         }
-        $properties = new \Ds\Map($attributes);
-        $count = (int)$properties->remove('count');
-        return new Line($properties, $count);
+        return new Line($properties, (int)$properties->remove('count'));
     }
 
     /**

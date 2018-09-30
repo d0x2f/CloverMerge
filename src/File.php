@@ -79,7 +79,7 @@ class File
                 }
                 $file->mergeLine((int)$attributes['num'], Line::fromXml($child));
             } else {
-                Utilities::logWarning("Ignoring unknown element: {$name}");
+                Utilities::logWarning("Ignoring unknown element: {$name}.");
             }
         }
         return $file;
@@ -130,17 +130,6 @@ class File
         } else {
             $this->lines->put($number, $line);
         }
-    }
-
-    /**
-     * Set the package this file belongs to if it isn't already set.
-     *
-     * @param string $package_name
-     * @return void
-     */
-    public function mergePackageName(string $package_name)
-    {
-        $this->package_name = $this->package_name ?? $package_name;
     }
 
     /**

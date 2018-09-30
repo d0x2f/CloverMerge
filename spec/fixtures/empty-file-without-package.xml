@@ -2,5 +2,6 @@
 <coverage>
     <project>
         <file name="test.php"/>
+        <file name="other.php"/>
     </project>
 </coverage>

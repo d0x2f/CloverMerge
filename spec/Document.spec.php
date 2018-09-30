@@ -5,6 +5,7 @@ namespace d0x2f\CloverMerge\Spec;
 use d0x2f\CloverMerge\Document;
 use d0x2f\CloverMerge\File;
 use d0x2f\CloverMerge\Utilities;
+use d0x2f\CloverMerge\Metrics;
 
 describe('Document', function () {
     describe('parseSet', function () {
@@ -17,17 +18,24 @@ describe('Document', function () {
             });
 
             it('returns a map of files parsed from the input.', function () {
-                expect($this->result)->toBeAnInstanceOf('\Ds\Map');
-                expect($this->result)->toHaveLength(1);
+                expect($this->result)->toBeAnInstanceOf(\Ds\Map::class);
+                expect($this->result)->toHaveLength(2);
 
-                $file = $this->result->first()->value;
+                expect($this->result->keys()->toArray())->toBe([
+                    'test.php',
+                    'metrics'
+                ]);
+
+                $metrics = $this->result->get('metrics');
+                expect($metrics)->toBeAnInstanceOf(Metrics::class);
+
+                $file = $this->result->get('test.php');
                 expect($file)->toBeAnInstanceOf(File::class);
 
                 $lines = $file->getLines();
                 expect($lines)->toHaveLength(5);
 
-                $keys = $lines->keys();
-                expect($keys)->toEqual(new \Ds\Set([1, 2, 3, 4, 5]));
+                expect($lines->keys()->toArray())->toBe([1, 2, 3, 4, 5]);
 
                 expect($lines->get(1)->getCount())->toBe(0);
                 expect($lines->get(2)->getCount())->toBe(2);
@@ -64,13 +72,31 @@ describe('Document', function () {
                 expect($lines)->toHaveLength(5);
 
                 $keys = $lines->keys();
-                expect($keys)->toEqual(new \Ds\Set([1, 2, 3, 4, 5]));
+                expect($keys->toArray())->toBe([1, 2, 3, 4, 5]);
 
                 expect($lines->get(1)->getCount())->toBe(0);
                 expect($lines->get(2)->getCount())->toBe(1);
                 expect($lines->get(3)->getCount())->toBe(2);
                 expect($lines->get(4)->getCount())->toBe(3);
                 expect($lines->get(5)->getCount())->toBe(4);
+            });
+        });
+        describe('Receives a vector of XML documents with errors.', function () {
+            beforeEach(function () {
+                allow(Utilities::class)->toReceive('::logWarning')->andReturn();
+                $this->closure = function () {
+                    return Document::parseSet(new \Ds\Vector([
+                        simplexml_load_file(__DIR__.'/fixtures/file-with-errors.xml')
+                    ]));
+                };
+            });
+
+            it('Makes a warning log entry for each encountered error.', function () {
+                $result = $this->closure();
+
+                expect(Utilities::class)->toReceive('::logWarning')->with('Ignoring package with no name.');
+                expect(Utilities::class)->toReceive('::logWarning')->with('Ignoring file with no name.');
+                expect(Utilities::class)->toReceive('::logWarning')->with('Ignoring unknown element: bogus.');
             });
         });
     });
