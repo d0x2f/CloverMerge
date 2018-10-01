@@ -60,29 +60,41 @@ class File
         $file = new File($package_name);
         $children = $xml->children();
         foreach ($children as $child) {
-            $name = $child->getName();
-            $attributes = iterator_to_array($child->attributes());
-            if ($name === 'class') {
-                if (!array_key_exists('name', $attributes)) {
-                    Utilities::logWarning('Ignoring class with no name.');
-                    continue;
-                }
-                $file->mergeClass($attributes['name'], ClassT::fromXml($child));
-            } elseif ($name === 'metrics') {
-                $file->mergeMetrics(Metrics::fromXml($child));
-            } elseif ($name === 'line') {
-                if (!array_key_exists('num', $attributes) ||
-                    !array_key_exists('count', $attributes)
-                ) {
-                    Utilities::logWarning('Ignoring line with no num or count.');
-                    continue;
-                }
-                $file->mergeLine((int)$attributes['num'], Line::fromXml($child));
-            } else {
-                Utilities::logWarning("Ignoring unknown element: {$name}.");
-            }
+            self::parseChildXml($file, $child);
         }
         return $file;
+    }
+
+    /**
+     * Parse a child element into an appropriate class.
+     *
+     * @param File $file
+     * @param \SimpleXMLElement $child
+     * @return void
+     */
+    private static function parseChildXML(File &$file, \SimpleXMLElement $child)
+    {
+        $name = $child->getName();
+        $attributes = iterator_to_array($child->attributes());
+        if ($name === 'class') {
+            if (!array_key_exists('name', $attributes)) {
+                Utilities::logWarning('Ignoring class with no name.');
+                return;
+            }
+            $file->mergeClass($attributes['name'], ClassT::fromXml($child));
+        } elseif ($name === 'metrics') {
+            $file->mergeMetrics(Metrics::fromXml($child));
+        } elseif ($name === 'line') {
+            if (!array_key_exists('num', $attributes) ||
+                !array_key_exists('count', $attributes)
+            ) {
+                Utilities::logWarning('Ignoring line with no num or count.');
+                return;
+            }
+            $file->mergeLine((int)$attributes['num'], Line::fromXml($child));
+        } else {
+            Utilities::logWarning("Ignoring unknown element: {$name}.");
+        }
     }
 
     /**

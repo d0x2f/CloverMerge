@@ -57,17 +57,7 @@ class Document
                 }
                 self::parseItems($items, $element->children(), $attributes['name'] ?? null);
             } elseif ($name === 'file') {
-                if (!array_key_exists('name', $attributes)) {
-                    Utilities::logWarning('Ignoring file with no name.');
-                    continue;
-                }
-                $file_name = (string)$attributes['name'];
-                $file = File::fromXml($element, $package_name);
-                if ($items->hasKey($file_name)) {
-                    $items->get($file_name)->merge($file);
-                } else {
-                    $items->put($file_name, $file);
-                }
+                self::parseFile($items, $element, $package_name);
             } elseif ($name === 'metrics') {
                 $metrics = Metrics::fromXml($element);
                 if (!$items->hasKey('metrics')) {
@@ -76,6 +66,34 @@ class Document
             } else {
                 Utilities::logWarning("Ignoring unknown element: {$name}.");
             }
+        }
+    }
+
+    /**
+     * Parse a file xml element.
+     *
+     * @param \Ds\Map $items
+     * @param \SimpleXMLElement $element
+     * @param string|null $package_name
+     * @return void
+     */
+    private static function parseFile(
+        \Ds\Map &$items,
+        \SimpleXMLElement $element,
+        ?string $package_name = null
+    ) : void {
+        $name = $element->getName();
+        $attributes = iterator_to_array($element->attributes());
+        if (!array_key_exists('name', $attributes)) {
+            Utilities::logWarning('Ignoring file with no name.');
+            return;
+        }
+        $file_name = (string)$attributes['name'];
+        $file = File::fromXml($element, $package_name);
+        if ($items->hasKey($file_name)) {
+            $items->get($file_name)->merge($file);
+        } else {
+            $items->put($file_name, $file);
         }
     }
 
@@ -126,6 +144,14 @@ class Document
         return $xml_document->saveXML();
     }
 
+    /**
+     * Build an xml representation of a file.
+     *
+     * @param \DomDocument $xml_document
+     * @param string $name
+     * @param File $file
+     * @return \DOMElement
+     */
     private static function buildFile(\DomDocument $xml_document, string $name, File $file) : \DOMElement
     {
         $xml_file = $xml_document->createElement('file');
@@ -165,6 +191,13 @@ class Document
         return $xml_file;
     }
 
+    /**
+     * Build an xml representation of a set of metrics.
+     *
+     * @param \DomDocument $xml_document
+     * @param Metrics $metrics
+     * @return \DOMElement
+     */
     private static function buildMetrics(\DomDocument $xml_document, Metrics $metrics) : \DOMElement
     {
         $xml_metrics = $xml_document->createElement('metrics');
