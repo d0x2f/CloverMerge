@@ -11,7 +11,6 @@
         }
     ],
     "require": {
-        "jms/serializer": "^1.13",
         "vanilla/garden-cli": "^2.1",
         "php-ds/php-ds": "^1.2"
     },
