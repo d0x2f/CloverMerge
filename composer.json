@@ -2,7 +2,6 @@
     "name": "d0x2f/clover-merge",
     "description": "Merge two or more clover XML files.",
     "type": "project",
-    "version": "1.0.0",
     "license": "MIT",
     "authors": [
         {
