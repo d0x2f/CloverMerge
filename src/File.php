@@ -101,16 +101,25 @@ class File
      * Merge another file with this one.
      *
      * @param File $other
+     * @param string $merge_mode inclusive, exclusive or additive
+     * @param bool $lock_lines Don't add new lines when true.
      * @return void
      */
-    public function merge(File $other) : void
+    public function merge(File $other, string $merge_mode = 'inclusive', bool $lock_lines = false) : void
     {
         $this->classes = $other->getClasses()->merge($this->classes);
         $this->package_name = $this->package_name ?? $other->package_name;
         $this->metrics = $this->metrics ?? $other->metrics;
 
-        foreach ($other->getLines() as $number => $line) {
-            $this->mergeLine($number, $line);
+        $other_lines = $other->getLines();
+
+        if ($merge_mode === 'exclusive') {
+            $this->lines = $this->lines->intersect($other_lines);
+            $other_lines = $other_lines->intersect($this->lines);
+        }
+
+        foreach ($other_lines as $number => $line) {
+            $this->mergeLine($number, $line, $lock_lines);
         }
     }
 
@@ -133,13 +142,14 @@ class File
      *
      * @param integer $number
      * @param Line $line
+     * @param bool $lock_lines Don't add new lines when true.
      * @return void
      */
-    public function mergeLine(int $number, Line $line) : void
+    public function mergeLine(int $number, Line $line, bool $lock_lines = false) : void
     {
         if ($this->lines->hasKey($number)) {
             $this->lines->get($number)->merge($line);
-        } else {
+        } elseif (!$lock_lines) {
             $this->lines->put($number, $line);
         }
     }

@@ -17,6 +17,13 @@ class Invocation
     private $output_path;
 
     /**
+     * Merge mode.
+     *
+     * @var string
+     */
+    private $merge_mode;
+
+    /**
      * Parsed input XML documents.
      *
      * @var \Ds\Vector
@@ -32,6 +39,7 @@ class Invocation
     {
         $cli = Cli::create()
             ->opt('output:o', 'output file path', true)
+            ->opt('mode:m', 'merge mode: additive, exclusive or inclusive (default)', false)
             ->arg('paths', 'input file paths', true);
 
         try {
@@ -41,6 +49,11 @@ class Invocation
         }
 
         $this->output_path = $arguments->getOpt('output');
+        $this->merge_mode = $arguments->getOpt('mode', 'inclusive');
+
+        if (!in_array($this->merge_mode, ['inclusive', 'exclusive', 'additive'])) {
+            throw new ArgumentException('Merge option must be one of: additive, exclusive or inclusive.');
+        }
 
         // Using a set removes duplicates but we need to wait for the next ds realease to
         // add support for the map method.
@@ -67,8 +80,9 @@ class Invocation
 
     public function execute() : void
     {
-        $items = Document::parseSet($this->documents);
-        $output = Document::build($items);
+        $accumulator = new Accumulator($this->merge_mode);
+        $accumulator->parseAll($this->documents);
+        $output = $accumulator->toXml();
         $write_result = file_put_contents($this->output_path, $output);
         if ($write_result === false) {
             throw new FileException("Unable to write to given output file.");
