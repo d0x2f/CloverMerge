@@ -100,11 +100,11 @@ class File
     /**
      * Get the covered and total lines count.
      *
-     * @return void
+     * @return array{0:int,1:int}
      */
-    public function getCoverage()
+    public function getCoverage() : array
     {
-        $covered = $this->lines->filter(function(int $number, Line $line) {
+        $covered = $this->lines->filter(function (int $number, Line $line) {
             return $line->getCount() > 0;
         })->count();
         return [$covered, $this->lines->count()];

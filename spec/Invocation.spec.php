@@ -157,7 +157,7 @@ describe('Invocation', function () {
                 beforeEach(function () {
                     allow('file_put_contents')->toBeCalled()->andReturn(false);
                 });
-                it('attempts to write to the file and throws an error.', function() {
+                it('attempts to write to the file and throws an error.', function () {
                     expect('file_put_contents')->toBeCalled()->with(
                         'test'
                     )->once();
