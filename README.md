@@ -50,10 +50,14 @@ ARGUMENTS
 
 ```bash
 $ ./vendor/bin/clover-merge -o combined.xml input1.xml input2.xml
+Files Discovered: 332
+Final Coverage: 14534/14558 (99.84%)
 ```
 
 ## As a Docker Image
 
 ```bash
-$ docker run --rm -v $(pwd)/build:/build clover-merge -o /build/combined.xml /build/input1.xml /build/input2.xml
+$ docker run --rm -v $(pwd):/build clover-merge -o /build/combined.xml /build/input1.xml /build/input2.xml
+Files Discovered: 332
+Final Coverage: 14534/14558 (99.84%)
 ```
