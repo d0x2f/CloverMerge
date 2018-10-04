@@ -98,6 +98,19 @@ class File
     }
 
     /**
+     * Get the covered and total lines count.
+     *
+     * @return void
+     */
+    public function getCoverage()
+    {
+        $covered = $this->lines->filter(function(int $number, Line $line) {
+            return $line->getCount() > 0;
+        })->count();
+        return [$covered, $this->lines->count()];
+    }
+
+    /**
      * Merge another file with this one.
      *
      * @param File $other

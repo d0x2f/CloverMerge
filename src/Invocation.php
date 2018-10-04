@@ -81,11 +81,26 @@ class Invocation
     public function execute() : void
     {
         $accumulator = new Accumulator($this->merge_mode);
+
+        // Parse
         $accumulator->parseAll($this->documents);
+
+        // Output
         $output = $accumulator->toXml();
         $write_result = file_put_contents($this->output_path, $output);
         if ($write_result === false) {
             throw new FileException("Unable to write to given output file.");
         }
+
+        // Stats
+        $files_discovered = $accumulator->getFileCount();
+        [$covered, $total] = $accumulator->getCoverage();
+        if ($total === 0) {
+            $coverage_percentage = 0;
+        } else {
+            $coverage_percentage = 100 * $covered/$total;
+        }
+        printf("Files Discovered: %d\n", $files_discovered);
+        printf("Final Coverage: %d/%d (%.2f%%)\n", $covered, $total, $coverage_percentage);
     }
 }

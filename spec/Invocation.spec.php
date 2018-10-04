@@ -117,7 +117,7 @@ describe('Invocation', function () {
                     expect('file_put_contents')->toBeCalled()->with(
                         __DIR__.'/../test_output/fixtures_result.xml'
                     )->once();
-                    $this->closure();
+                    expect($this->closure)->toEcho("Files Discovered: 4\nFinal Coverage: 17/24 (70.83%)\n");
                 });
             });
         });
@@ -139,25 +139,25 @@ describe('Invocation', function () {
                     allow('file_put_contents')->toBeCalled()->andReturn(100);
                 });
                 it('delegates to Accumulator::parseAll.', function () {
+                    expect($this->closure)->toEcho("Files Discovered: 0\nFinal Coverage: 0/0 (0.00%)\n");
                     expect(Accumulator::class)->toReceive('parseAll');
-                    $this->closure();
                 });
                 it('delegates to Accumulator::toXml.', function () {
+                    expect($this->closure)->toEcho("Files Discovered: 0\nFinal Coverage: 0/0 (0.00%)\n");
                     expect(Accumulator::class)->toReceive('toXml');
-                    $this->closure();
                 });
                 it('writes to the output file.', function () {
                     expect('file_put_contents')->toBeCalled()->with(
                         'test'
                     )->once();
-                    $this->closure();
+                    expect($this->closure)->toEcho("Files Discovered: 0\nFinal Coverage: 0/0 (0.00%)\n");
                 });
             });
             describe('Executes an invocation instance where the output file in unreadable.', function () {
                 beforeEach(function () {
                     allow('file_put_contents')->toBeCalled()->andReturn(false);
                 });
-                it('throws an error.', function () {
+                it('attempts to write to the file and throws an error.', function() {
                     expect('file_put_contents')->toBeCalled()->with(
                         'test'
                     )->once();

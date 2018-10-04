@@ -75,6 +75,34 @@ class Accumulator
     }
 
     /**
+     * Get the number of files discovered.
+     *
+     * @return integer
+     */
+    public function getFileCount() : int
+    {
+        return $this->files->count();
+    }
+
+    /**
+     * Sum coverage information.
+     *
+     * @return array{0:int,1:int}
+     */
+    public function getCoverage() : array
+    {
+        return $this->files->reduce(
+            function (array $carry, string $key, File $file) {
+                [$covered, $total] = $file->getCoverage();
+                $carry[0] += $covered;
+                $carry[1] += $total;
+                return $carry;
+            },
+            [0, 0]
+        );
+    }
+
+    /**
      * Parse each document in the given collection.
      *
      * @param \Ds\Collection $documents
@@ -219,9 +247,10 @@ class Accumulator
                 $xml_package->appendChild($xml_file);
                 $packages->put($package_name, $xml_package);
             }
-            if (!is_null($this->metrics)) {
-                $xml_project->appendChild(Accumulator::buildMetrics($xml_document, $this->metrics));
-            }
+        }
+
+        if (!is_null($this->metrics)) {
+            $xml_project->appendChild(Accumulator::buildMetrics($xml_document, $this->metrics));
         }
 
         return $xml_document->saveXML();
