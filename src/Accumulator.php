@@ -130,14 +130,9 @@ class Accumulator
             Utilities::logWarning("Ignoring unexpected element: {$name}.");
             return;
         }
-        $projects = $document->children();
-        foreach ($projects as $project) {
-            $name = $project->getName();
-            if ($name !== 'project') {
-                Utilities::logWarning("Ignoring unexpected element: {$name}.");
-                continue;
-            }
-            $this->parseItems($project->children());
+
+        foreach ($document->children() as $project) {
+            $this->parseProject($project);
         }
 
         // Prevent subsequent documents from adding new lines.
@@ -153,34 +148,62 @@ class Accumulator
     }
 
     /**
-     * Parse items from the given elements.
+     * Parse a project element.
      *
-     * @param \SimpleXMLElement $elements
+     * @param \SimpleXMLElement $project
+     * @return void
+     */
+    private function parseProject(\SimpleXMLElement $project) : void
+    {
+        $name = $project->getName();
+        if ($name !== 'project') {
+            Utilities::logWarning("Ignoring unexpected element: {$name}.");
+            return;
+        }
+        $this->parseItems($project->children());
+    }
+
+    /**
+     * Parse a set of items.
+     *
+     * @param \SimpleXMLElement $items
+     * @param string|null $package_name
+     * @return void
+     */
+    private function parseItems(\SimpleXMLElement $items, ?string $package_name = null) : void
+    {
+        foreach ($items as $item) {
+            $this->parseItem($item, $package_name);
+        }
+    }
+
+    /**
+     * Parse an item.
+     *
+     * @param \SimpleXMLElement $element
      * @param string|null $package_name The package name new files should be given.
      * @return void
      */
-    private function parseItems(
-        \SimpleXMLElement $elements,
+    private function parseItem(
+        \SimpleXMLElement $element,
         ?string $package_name = null
     ) : void {
-        foreach ($elements as $element) {
-            $name = $element->getName();
-            $attributes = iterator_to_array($element->attributes());
-            if ($name === 'package') {
-                if (!array_key_exists('name', $attributes)) {
-                    Utilities::logWarning('Ignoring package with no name.');
-                }
-                $this->parseItems($element->children(), $attributes['name'] ?? null);
-            } elseif ($name === 'file') {
-                $this->parseFile($element, $package_name);
-            } elseif ($name === 'metrics') {
-                $metrics = Metrics::fromXml($element);
-                if (is_null($this->metrics)) {
-                    $this->metrics = $metrics;
-                }
-            } else {
-                Utilities::logWarning("Ignoring unexpected element: {$name}.");
+        $name = $element->getName();
+        $attributes = iterator_to_array($element->attributes());
+        if ($name === 'package') {
+            if (!array_key_exists('name', $attributes)) {
+                Utilities::logWarning('Ignoring package with no name.');
             }
+            $this->parseItems($element->children(), $attributes['name'] ?? null);
+        } elseif ($name === 'file') {
+            $this->parseFile($element, $package_name);
+        } elseif ($name === 'metrics') {
+            $metrics = Metrics::fromXml($element);
+            if (is_null($this->metrics)) {
+                $this->metrics = $metrics;
+            }
+        } else {
+            Utilities::logWarning("Ignoring unexpected element: {$name}.");
         }
     }
 
