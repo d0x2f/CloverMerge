@@ -41,7 +41,7 @@ class ClassT
      */
     public static function fromXML(\SimpleXMLElement $xml) : ClassT
     {
-        $attributes = iterator_to_array($xml->attributes());
+        $attributes = $xml->attributes();
         $class = new ClassT($attributes['namespace'] ?? null);
         $children = $xml->children();
         foreach ($children as $child) {

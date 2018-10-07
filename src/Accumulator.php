@@ -92,7 +92,7 @@ class Accumulator
     public function getCoverage() : array
     {
         return $this->files->reduce(
-            function (array $carry, string $key, File $file) {
+            function (array $carry, string $_, File $file) {
                 [$covered, $total] = $file->getCoverage();
                 $carry[0] += $covered;
                 $carry[1] += $total;
@@ -189,12 +189,13 @@ class Accumulator
         ?string $package_name = null
     ) : void {
         $name = $element->getName();
-        $attributes = iterator_to_array($element->attributes());
         if ($name === 'package') {
-            if (!array_key_exists('name', $attributes)) {
+            $attributes = $element->attributes();
+            if (!Utilities::xmlHasAttributes($element, ['name'])) {
                 Utilities::logWarning('Ignoring package with no name.');
+                return;
             }
-            $this->parseItems($element->children(), $attributes['name'] ?? null);
+            $this->parseItems($element->children(), $attributes['name']);
         } elseif ($name === 'file') {
             $this->parseFile($element, $package_name);
         } elseif ($name === 'metrics') {
@@ -218,9 +219,8 @@ class Accumulator
         \SimpleXMLElement $element,
         ?string $package_name = null
     ) : void {
-        $name = $element->getName();
-        $attributes = iterator_to_array($element->attributes());
-        if (!array_key_exists('name', $attributes)) {
+        $attributes = $element->attributes();
+        if (!Utilities::xmlHasAttributes($element, ['name'])) {
             Utilities::logWarning('Ignoring file with no name.');
             return;
         }

@@ -34,6 +34,7 @@ class Invocation
      * Initialise the invocation.
      *
      * @param array $argv
+     * @throws ArgumentException
      */
     public function __construct(array $argv)
     {
@@ -69,6 +70,9 @@ class Invocation
             throw new ArgumentException("One or more of the given file paths couldn't be found.");
         }
 
+        /**
+         * @throws ArgumentException
+         */
         $this->documents = $paths->map(function ($path) {
             $document = simplexml_load_file($path);
             if ($document === false) {
@@ -78,6 +82,12 @@ class Invocation
         });
     }
 
+    /**
+     * Execute the invocation.
+     *
+     * @return void
+     * @throws FileException
+     */
     public function execute() : void
     {
         $accumulator = new Accumulator($this->merge_mode);

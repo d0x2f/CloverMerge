@@ -75,19 +75,17 @@ class File
     private static function parseChildXML(File &$file, \SimpleXMLElement $child)
     {
         $name = $child->getName();
-        $attributes = iterator_to_array($child->attributes());
+        $attributes = $child->attributes();
         if ($name === 'class') {
-            if (!array_key_exists('name', $attributes)) {
+            if (!Utilities::xmlHasAttributes($child, ['name'])) {
                 Utilities::logWarning('Ignoring class with no name.');
                 return;
             }
-            $file->mergeClass($attributes['name'], ClassT::fromXml($child));
+            $file->mergeClass($attributes['name'] ?? '', ClassT::fromXml($child));
         } elseif ($name === 'metrics') {
             $file->mergeMetrics(Metrics::fromXml($child));
         } elseif ($name === 'line') {
-            if (!array_key_exists('num', $attributes) ||
-                !array_key_exists('count', $attributes)
-            ) {
+            if (!Utilities::xmlHasAttributes($child, ['num', 'count'])) {
                 Utilities::logWarning('Ignoring line with no num or count.');
                 return;
             }
@@ -104,7 +102,7 @@ class File
      */
     public function getCoverage() : array
     {
-        $covered = $this->lines->filter(function (int $number, Line $line) {
+        $covered = $this->lines->filter(function (int $_, Line $line) {
             return $line->getCount() > 0;
         })->count();
         return [$covered, $this->lines->count()];

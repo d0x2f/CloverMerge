@@ -38,11 +38,12 @@ class Line
      *
      * @param \SimpleXMLElement $xml
      * @return Line
+     * @throws ParseException
      */
     public static function fromXML(\SimpleXMLElement $xml) : Line
     {
         $properties = new \Ds\Map($xml->attributes());
-        $properties->apply(function ($key, $value) {
+        $properties->apply(function ($_, $value) {
             return (string) $value;
         });
         if (!$properties->hasKey('count')) {

@@ -157,9 +157,7 @@ describe('Accumulator', function () {
             });
 
             it('Makes a warning log entry for each encountered error.', function () {
-                expect(Utilities::class)->toReceive('::logWarning')->with('Ignoring package with no name.');
-                expect(Utilities::class)->toReceive('::logWarning')->with('Ignoring file with no name.');
-                expect(Utilities::class)->toReceive('::logWarning')->with('Ignoring unexpected element: bogus.');
+                expect(Utilities::class)->toReceive('::logWarning')->with('Ignoring package with no name.')->times(2);
             });
         });
     });

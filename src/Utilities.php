@@ -26,6 +26,25 @@ class Utilities
     }
 
     /**
+     * Check that the given XML element has the given attributes.
+     *
+     * @param \SimpleXMLElement $element
+     * @param array $attribute_names
+     * @return boolean
+     */
+    public static function xmlHasAttributes(
+        \SimpleXMLElement $element,
+        array $attribute_names
+    ) : bool {
+        $attributes = $element->attributes();
+        if (is_null($attributes)) {
+            return false;
+        }
+        $keys = array_keys(iterator_to_array($attributes));
+        return count(array_intersect($keys, $attribute_names)) === count($attribute_names);
+    }
+
+    /**
      * Info log.
      *
      * @param string $message
