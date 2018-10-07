@@ -3,7 +3,7 @@
 namespace d0x2f\CloverMerge\Spec;
 
 use d0x2f\CloverMerge\Invocation;
-use d0x2f\CloverMerge\Document;
+use d0x2f\CloverMerge\Accumulator;
 use d0x2f\CloverMerge\Utilities;
 
 describe('Invocation', function () {
@@ -41,6 +41,17 @@ describe('Invocation', function () {
 
             it('throws an error.', function () {
                 expect($this->closure)->toThrow('Missing required option: output');
+            });
+        });
+        describe('Receives a cli argument list with an invalid mode option.', function () {
+            beforeEach(function () {
+                $this->closure = function () {
+                    new Invocation(['prog', '-o', 'test', '-m', 'bogus', 'file']);
+                };
+            });
+
+            it('throws an error.', function () {
+                expect($this->closure)->toThrow('Merge option must be one of: additive, exclusive or inclusive.');
             });
         });
         describe('Receives a cli argument list without any filenames given.', function () {
@@ -106,7 +117,7 @@ describe('Invocation', function () {
                     expect('file_put_contents')->toBeCalled()->with(
                         __DIR__.'/../test_output/fixtures_result.xml'
                     )->once();
-                    $this->closure();
+                    expect($this->closure)->toEcho("Files Discovered: 4\nFinal Coverage: 17/24 (70.83%)\n");
                 });
             });
         });
@@ -116,8 +127,8 @@ describe('Invocation', function () {
                 allow('simplexml_load_file')->toBeCalled()->andReturn(
                     new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><coverage/>')
                 );
-                allow(Document::class)->toReceive('::parseSet')->andReturn(new \Ds\Map());
-                allow(Document::class)->toReceive('::build')->andReturn(new \Ds\Map());
+                allow(Accumulator::class)->toReceive('parseAll')->andReturn();
+                allow(Accumulator::class)->toReceive('toXml')->andReturn(new \Ds\Map());
                 $this->invocation = new Invocation(['prog', '-o', 'test', 'path', 'path2']);
                 $this->closure = function () {
                     $this->invocation->execute();
@@ -127,26 +138,26 @@ describe('Invocation', function () {
                 beforeEach(function () {
                     allow('file_put_contents')->toBeCalled()->andReturn(100);
                 });
-                it('delegates to Document::parseSet.', function () {
-                    expect(Document::class)->toReceive('::parseSet');
-                    $this->closure();
+                it('delegates to Accumulator::parseAll.', function () {
+                    expect($this->closure)->toEcho("Files Discovered: 0\nFinal Coverage: 0/0 (0.00%)\n");
+                    expect(Accumulator::class)->toReceive('parseAll');
                 });
-                it('delegates to Document::build.', function () {
-                    expect(Document::class)->toReceive('::build');
-                    $this->closure();
+                it('delegates to Accumulator::toXml.', function () {
+                    expect($this->closure)->toEcho("Files Discovered: 0\nFinal Coverage: 0/0 (0.00%)\n");
+                    expect(Accumulator::class)->toReceive('toXml');
                 });
                 it('writes to the output file.', function () {
                     expect('file_put_contents')->toBeCalled()->with(
                         'test'
                     )->once();
-                    $this->closure();
+                    expect($this->closure)->toEcho("Files Discovered: 0\nFinal Coverage: 0/0 (0.00%)\n");
                 });
             });
             describe('Executes an invocation instance where the output file in unreadable.', function () {
                 beforeEach(function () {
                     allow('file_put_contents')->toBeCalled()->andReturn(false);
                 });
-                it('throws an error.', function () {
+                it('attempts to write to the file and throws an error.', function () {
                     expect('file_put_contents')->toBeCalled()->with(
                         'test'
                     )->once();

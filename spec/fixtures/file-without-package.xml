@@ -8,5 +8,6 @@
             <line num="4" type="stmt" count="3"/>
             <line num="5" type="stmt" count="4"/>
         </file>
+        <metrics loc="719" ncloc="578" statements="141" coveredstatements="138"/>
     </project>
 </coverage>

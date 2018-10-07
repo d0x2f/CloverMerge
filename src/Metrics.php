@@ -32,7 +32,11 @@ class Metrics
      */
     public static function fromXML(\SimpleXMLElement $xml) : Metrics
     {
-        return new Metrics(new \Ds\Map($xml->attributes()));
+        $properties = new \Ds\Map($xml->attributes());
+        $properties->apply(function ($key, $value) {
+            return (string) $value;
+        });
+        return new Metrics($properties);
     }
 
     /**
@@ -43,16 +47,5 @@ class Metrics
     public function getProperties() : \Ds\Map
     {
         return $this->properties;
-    }
-
-    /**
-     * Set properties.
-     *
-     * @param \Ds\Map $properties
-     * @return void
-     */
-    public function setProperties(\Ds\Map $properties) : void
-    {
-        $this->properties = $properties;
     }
 }

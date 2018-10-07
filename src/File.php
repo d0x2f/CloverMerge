@@ -60,45 +60,79 @@ class File
         $file = new File($package_name);
         $children = $xml->children();
         foreach ($children as $child) {
-            $name = $child->getName();
-            $attributes = iterator_to_array($child->attributes());
-            if ($name === 'class') {
-                if (!array_key_exists('name', $attributes)) {
-                    Utilities::logWarning('Ignoring class with no name.');
-                    continue;
-                }
-                $file->mergeClass($attributes['name'], ClassT::fromXml($child));
-            } elseif ($name === 'metrics') {
-                $file->mergeMetrics(Metrics::fromXml($child));
-            } elseif ($name === 'line') {
-                if (!array_key_exists('num', $attributes) ||
-                    !array_key_exists('count', $attributes)
-                ) {
-                    Utilities::logWarning('Ignoring line with no num or count.');
-                    continue;
-                }
-                $file->mergeLine((int)$attributes['num'], Line::fromXml($child));
-            } else {
-                Utilities::logWarning("Ignoring unknown element: {$name}");
-            }
+            self::parseChildXml($file, $child);
         }
         return $file;
+    }
+
+    /**
+     * Parse a child element into an appropriate class.
+     *
+     * @param File $file
+     * @param \SimpleXMLElement $child
+     * @return void
+     */
+    private static function parseChildXML(File &$file, \SimpleXMLElement $child)
+    {
+        $name = $child->getName();
+        $attributes = iterator_to_array($child->attributes());
+        if ($name === 'class') {
+            if (!array_key_exists('name', $attributes)) {
+                Utilities::logWarning('Ignoring class with no name.');
+                return;
+            }
+            $file->mergeClass($attributes['name'], ClassT::fromXml($child));
+        } elseif ($name === 'metrics') {
+            $file->mergeMetrics(Metrics::fromXml($child));
+        } elseif ($name === 'line') {
+            if (!array_key_exists('num', $attributes) ||
+                !array_key_exists('count', $attributes)
+            ) {
+                Utilities::logWarning('Ignoring line with no num or count.');
+                return;
+            }
+            $file->mergeLine((int)$attributes['num'], Line::fromXml($child));
+        } else {
+            Utilities::logWarning("Ignoring unknown element: {$name}.");
+        }
+    }
+
+    /**
+     * Get the covered and total lines count.
+     *
+     * @return array{0:int,1:int}
+     */
+    public function getCoverage() : array
+    {
+        $covered = $this->lines->filter(function (int $number, Line $line) {
+            return $line->getCount() > 0;
+        })->count();
+        return [$covered, $this->lines->count()];
     }
 
     /**
      * Merge another file with this one.
      *
      * @param File $other
+     * @param string $merge_mode inclusive, exclusive or additive
+     * @param bool $lock_lines Don't add new lines when true.
      * @return void
      */
-    public function merge(File $other) : void
+    public function merge(File $other, string $merge_mode = 'inclusive', bool $lock_lines = false) : void
     {
         $this->classes = $other->getClasses()->merge($this->classes);
         $this->package_name = $this->package_name ?? $other->package_name;
         $this->metrics = $this->metrics ?? $other->metrics;
 
-        foreach ($other->getLines() as $number => $line) {
-            $this->mergeLine($number, $line);
+        $other_lines = $other->getLines();
+
+        if ($merge_mode === 'exclusive') {
+            $this->lines = $this->lines->intersect($other_lines);
+            $other_lines = $other_lines->intersect($this->lines);
+        }
+
+        foreach ($other_lines as $number => $line) {
+            $this->mergeLine($number, $line, $lock_lines);
         }
     }
 
@@ -121,26 +155,16 @@ class File
      *
      * @param integer $number
      * @param Line $line
+     * @param bool $lock_lines Don't add new lines when true.
      * @return void
      */
-    public function mergeLine(int $number, Line $line) : void
+    public function mergeLine(int $number, Line $line, bool $lock_lines = false) : void
     {
         if ($this->lines->hasKey($number)) {
             $this->lines->get($number)->merge($line);
-        } else {
+        } elseif (!$lock_lines) {
             $this->lines->put($number, $line);
         }
-    }
-
-    /**
-     * Set the package this file belongs to if it isn't already set.
-     *
-     * @param string $package_name
-     * @return void
-     */
-    public function mergePackageName(string $package_name)
-    {
-        $this->package_name = $this->package_name ?? $package_name;
     }
 
     /**

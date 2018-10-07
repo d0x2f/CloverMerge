@@ -2,7 +2,6 @@
     "name": "d0x2f/clover-merge",
     "description": "Merge two or more clover XML files.",
     "type": "project",
-    "version": "1.0.0",
     "license": "MIT",
     "authors": [
         {
@@ -11,7 +10,6 @@
         }
     ],
     "require": {
-        "jms/serializer": "^1.13",
         "vanilla/garden-cli": "^2.1",
         "php-ds/php-ds": "^1.2"
     },

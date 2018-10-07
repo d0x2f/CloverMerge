@@ -49,7 +49,7 @@ class ClassT
             if ($name === 'metrics') {
                 $class->mergeMetrics(Metrics::fromXml($child));
             } else {
-                Utilities::logWarning("Ignoring unknown element: {$name}");
+                Utilities::logWarning("Ignoring unknown element: {$name}.");
             }
         }
         return $class;
