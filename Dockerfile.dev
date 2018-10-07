@@ -1,0 +1,32 @@
+FROM php:7.2-cli-alpine
+
+LABEL maintainers="me@dyl.dog"
+
+WORKDIR /build
+
+ARG XDEBUG_REMOTE_HOST
+
+RUN apk add --no-cache $PHPIZE_DEPS --virtual .phpize-deps \
+    && pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+    && apk del --no-cache  .phpize-deps
+
+RUN echo -e "xdebug.remote_connect_back=0\n" \
+    "xdebug.remote_autostart=1\n" \
+    "xdebug.remote_host=${XDEBUG_REMOTE_HOST}\n" \
+    "xdebug.remote_enable=1\n" \
+    "xdebug.overload_var_dump=0" | tr -d ' ' \
+    >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
+COPY --from=composer:1.6 /usr/bin/composer /usr/bin/composer
+ENV COMPOSER_ALLOW_SUPERUSER 1
+
+COPY composer.json composer.lock ./
+
+RUN composer install --no-suggest --no-interaction
+
+COPY . ./
+
+RUN composer dump-autoload --optimize
+
+ENTRYPOINT [ "./clover-merge" ]
