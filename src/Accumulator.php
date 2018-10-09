@@ -191,7 +191,7 @@ class Accumulator
         $name = $element->getName();
         if ($name === 'package') {
             $attributes = $element->attributes();
-            // Don't return here so that the packages files are still parsed regardless.
+            // Don't return here so that the package's files are still parsed regardless.
             if (!Utilities::xmlHasAttributes($element, ['name'])) {
                 Utilities::logWarning('Ignoring package with no name.');
             }
