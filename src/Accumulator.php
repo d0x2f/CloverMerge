@@ -105,10 +105,10 @@ class Accumulator
     /**
      * Parse each document in the given collection.
      *
-     * @param \Ds\Collection $documents
+     * @param \Traversable $documents
      * @return void
      */
-    public function parseAll(\Ds\Collection $documents) : void
+    public function parseAll(\Traversable $documents) : void
     {
         foreach ($documents as $document) {
             $this->parseXml($document);
@@ -191,11 +191,11 @@ class Accumulator
         $name = $element->getName();
         if ($name === 'package') {
             $attributes = $element->attributes();
+            // Don't return here so that the packages files are still parsed regardless.
             if (!Utilities::xmlHasAttributes($element, ['name'])) {
                 Utilities::logWarning('Ignoring package with no name.');
-                return;
             }
-            $this->parseItems($element->children(), $attributes['name']);
+            $this->parseItems($element->children(), $attributes['name'] ?? null);
         } elseif ($name === 'file') {
             $this->parseFile($element, $package_name);
         } elseif ($name === 'metrics') {
