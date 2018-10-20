@@ -5,9 +5,13 @@ namespace d0x2f\CloverMerge\Spec;
 use d0x2f\CloverMerge\Utilities;
 use Kahlan\Plugin\Double;
 
+/**
+ * @phan-closure-scope \Kahlan\Scope
+ * @phan-file-suppress PhanParamTooMany
+ */
 describe('Utilities', function () {
     describe('filesExist', function () {
-        describe('Receives a list of paths containing a non existant file first.', function () {
+        context('Receives a list of paths containing a non existant file first.', function () {
             beforeEach(function () {
                 allow('is_file')->toBeCalled()->andReturn(false, true, true);
                 $this->result = Utilities::filesExist(new \Ds\Vector(['no', 'yes', 'also yes']));
@@ -18,7 +22,7 @@ describe('Utilities', function () {
             });
         });
 
-        describe('Receives a list of paths containing a non existant file last.', function () {
+        context('Receives a list of paths containing a non existant file last.', function () {
             beforeEach(function () {
                 allow('is_file')->toBeCalled()->andReturn(true, true, false);
                 $this->result = Utilities::filesExist(new \Ds\Vector(['yes', 'also yes', 'no']));
@@ -29,7 +33,7 @@ describe('Utilities', function () {
             });
         });
 
-        describe('Receives a list of paths containing no missing files.', function () {
+        context('Receives a list of paths containing no missing files.', function () {
             beforeEach(function () {
                 allow('is_file')->toBeCalled()->andReturn(true, true, true);
                 $this->result = Utilities::filesExist(new \Ds\Vector(['yes', 'also yes', 'yes again']));
@@ -41,7 +45,7 @@ describe('Utilities', function () {
         });
     });
     describe('xmlHasAttributes', function () {
-        describe('Receives an element with the desired attributes.', function () {
+        context('Receives an element with the desired attributes.', function () {
             beforeEach(function () {
                 $element = new \SimpleXMLElement('<test foo="bar" barry="baz"/>');
                 $this->result = Utilities::xmlHasAttributes($element, ["foo", "barry"]);
@@ -51,7 +55,7 @@ describe('Utilities', function () {
                 expect($this->result)->toBeTruthy();
             });
         });
-        describe('Receives an element with one attribute missing.', function () {
+        context('Receives an element with one attribute missing.', function () {
             beforeEach(function () {
                 $element = new \SimpleXMLElement('<test foo="bar"/>');
                 $this->result = Utilities::xmlHasAttributes($element, ["foo", "barry"]);
@@ -61,7 +65,7 @@ describe('Utilities', function () {
                 expect($this->result)->toBeFalsy();
             });
         });
-        describe('Receives an element the one desired attribute.', function () {
+        context('Receives an element the one desired attribute.', function () {
             beforeEach(function () {
                 $element = new \SimpleXMLElement('<test foo="bar"/>');
                 $this->result = Utilities::xmlHasAttributes($element, ["foo"]);
@@ -71,7 +75,7 @@ describe('Utilities', function () {
                 expect($this->result)->toBeTruthy();
             });
         });
-        describe('Receives an element which is itself an attribute.', function () {
+        context('Receives an element which is itself an attribute.', function () {
             beforeEach(function () {
                 // The PHP docs claim that ->attributes() of an attribute returns null,
                 // but it doesn't seem to, so we'll mock it to force a null response
@@ -95,7 +99,7 @@ describe('Utilities', function () {
         });
     });
     describe('logInfo', function () {
-        describe('Receives a string to print.', function () {
+        context('Receives a string to print.', function () {
             beforeEach(function () {
                 $this->closure = function () {
                     Utilities::logInfo('test');
@@ -108,7 +112,7 @@ describe('Utilities', function () {
         });
     });
     describe('logWarning', function () {
-        describe('Receives a string to print.', function () {
+        context('Receives a string to print.', function () {
             beforeEach(function () {
                 $this->closure = function () {
                     Utilities::logWarning('test');

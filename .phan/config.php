@@ -38,6 +38,7 @@ return [
     'minimum_severity' => Issue::SEVERITY_LOW,
     'directory_list' => [
         'src/',
+        'spec/',
         'vendor/kahlan/kahlan/src',
         'vendor/vanilla/garden-cli/src',
         'vendor/php-ds/php-ds/src'

@@ -6,9 +6,13 @@ use d0x2f\CloverMerge\Invocation;
 use d0x2f\CloverMerge\Accumulator;
 use d0x2f\CloverMerge\Utilities;
 
+/**
+ * @phan-closure-scope \Kahlan\Scope
+ * @phan-file-suppress PhanParamTooMany
+ */
 describe('Invocation', function () {
     describe('__construct', function () {
-        describe('Receives a valid cli argument list.', function () {
+        context('Receives a valid cli argument list.', function () {
             beforeEach(function () {
                 allow('is_file')->toBeCalled()->andReturn(true);
                 allow('simplexml_load_file')->toBeCalled()->andReturn(
@@ -21,7 +25,7 @@ describe('Invocation', function () {
                 expect($this->invocation)->toBeAnInstanceOf('d0x2f\CloverMerge\Invocation');
             });
         });
-        describe('Receives an empty cli argument list.', function () {
+        context('Receives an empty cli argument list.', function () {
             beforeEach(function () {
                 $this->closure = function () {
                     new Invocation([]);
@@ -32,7 +36,7 @@ describe('Invocation', function () {
                 expect($this->closure)->toThrow();
             });
         });
-        describe('Receives a cli argument list missing the output option.', function () {
+        context('Receives a cli argument list missing the output option.', function () {
             beforeEach(function () {
                 $this->closure = function () {
                     new Invocation(['prog', 'file']);
@@ -43,7 +47,7 @@ describe('Invocation', function () {
                 expect($this->closure)->toThrow('Missing required option: output');
             });
         });
-        describe('Receives a cli argument list with an invalid mode option.', function () {
+        context('Receives a cli argument list with an invalid mode option.', function () {
             beforeEach(function () {
                 $this->closure = function () {
                     new Invocation(['prog', '-o', 'test', '-m', 'bogus', 'file']);
@@ -54,7 +58,7 @@ describe('Invocation', function () {
                 expect($this->closure)->toThrow('Merge option must be one of: additive, exclusive or inclusive.');
             });
         });
-        describe('Receives a cli argument list without any filenames given.', function () {
+        context('Receives a cli argument list without any filenames given.', function () {
             beforeEach(function () {
                 $this->closure = function () {
                     new Invocation(['prog', '-o', 'test']);
@@ -65,8 +69,8 @@ describe('Invocation', function () {
                 expect($this->closure)->toThrow("At least one input path is required (preferably two).");
             });
         });
-        describe('Receives a cli argument list containing a list of files to merge.', function () {
-            describe('Where one doesn\'t exist', function () {
+        context('Receives a cli argument list containing a list of files to merge.', function () {
+            context('Where one doesn\'t exist', function () {
                 beforeEach(function () {
                     allow('is_file')->toBeCalled()->andReturn(false);
                     $this->closure = function () {
@@ -79,7 +83,7 @@ describe('Invocation', function () {
                 });
             });
 
-            describe('Where one refers to an invalid XML document.', function () {
+            context('Where one refers to an invalid XML document.', function () {
                 beforeEach(function () {
                     allow('is_file')->toBeCalled()->andReturn(true);
                     allow('simplexml_load_file')->toBeCalled()->andReturn(false);
@@ -95,10 +99,11 @@ describe('Invocation', function () {
         });
     });
     describe('execute', function () {
-        describe('With fixtures.', function () {
-            describe('Executes on all available fixtures.', function () {
+        context('With fixtures.', function () {
+            context('Executes on all available fixtures.', function () {
                 beforeEach(function () {
                     $fixtures = glob(__DIR__.'/fixtures/*.xml');
+                    assert(is_array($fixtures));
                     $invocation = new Invocation(array_merge(
                         [
                             'prog',
@@ -121,7 +126,7 @@ describe('Invocation', function () {
                 });
             });
         });
-        describe('With mocked dependencies.', function () {
+        context('With mocked dependencies.', function () {
             beforeEach(function () {
                 allow('is_file')->toBeCalled()->andReturn(true);
                 allow('simplexml_load_file')->toBeCalled()->andReturn(
@@ -134,7 +139,7 @@ describe('Invocation', function () {
                     $this->invocation->execute();
                 };
             });
-            describe('Executes an invocation instance where the output file is readable.', function () {
+            context('Executes an invocation instance where the output file is readable.', function () {
                 beforeEach(function () {
                     allow('file_put_contents')->toBeCalled()->andReturn(100);
                 });
@@ -153,7 +158,7 @@ describe('Invocation', function () {
                     expect($this->closure)->toEcho("Files Discovered: 0\nFinal Coverage: 0/0 (0.00%)\n");
                 });
             });
-            describe('Executes an invocation instance where the output file in unreadable.', function () {
+            context('Executes an invocation instance where the output file in unreadable.', function () {
                 beforeEach(function () {
                     allow('file_put_contents')->toBeCalled()->andReturn(false);
                 });

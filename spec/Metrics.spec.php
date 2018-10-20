@@ -4,9 +4,12 @@ namespace d0x2f\CloverMerge\Spec;
 
 use d0x2f\CloverMerge\Metrics;
 
+/**
+ * @phan-closure-scope \Kahlan\Scope
+ */
 describe('Metrics', function () {
     describe('__construct', function () {
-        describe('Receives a map of properties.', function () {
+        context('Receives a map of properties.', function () {
             beforeEach(function () {
                 $this->instance = new Metrics(new \Ds\Map([
                     'foo' => 'bar',
@@ -20,12 +23,13 @@ describe('Metrics', function () {
         });
     });
     describe('fromXML', function () {
-        describe('Receives an XML element.', function () {
+        context('Receives an XML element.', function () {
             beforeEach(function () {
                 $xml_element = simplexml_load_string(
                     '<?xml version="1.0" encoding="UTF-8"?>
                     <metrics foo="bar" baz="fred" />'
                 );
+                assert($xml_element !== false);
                 $this->instance = Metrics::fromXML($xml_element);
             });
 

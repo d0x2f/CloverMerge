@@ -5,9 +5,13 @@ namespace d0x2f\CloverMerge\Spec;
 use d0x2f\CloverMerge\File;
 use d0x2f\CloverMerge\Utilities;
 
+/**
+ * @phan-closure-scope \Kahlan\Scope
+ * @phan-file-suppress PhanParamTooMany
+ */
 describe('File', function () {
     describe('__construct', function () {
-        describe('Receives a package name.', function () {
+        context('Receives a package name.', function () {
             beforeEach(function () {
                 $this->instance = new File('package_name');
             });
@@ -18,7 +22,7 @@ describe('File', function () {
         });
     });
     describe('fromXML', function () {
-        describe('Receives a valid XML element.', function () {
+        context('Receives a valid XML element.', function () {
             beforeEach(function () {
                 $xml_element = simplexml_load_string('
                     <file name="/src/Example/Namespace/Class.php">
@@ -31,6 +35,7 @@ describe('File', function () {
                         <metrics foo="bar" baz="fred"/>
                     </file>
                 ');
+                assert($xml_element !== false);
                 $this->instance = File::fromXML($xml_element, 'package_name');
             });
 
@@ -42,6 +47,7 @@ describe('File', function () {
                 expect($this->instance->getPackageName())->toBe('package_name');
             });
 
+            /** @phan-suppress PhanUndeclaredProperty */
             it('has the correct classes set.', function () {
                 $classes = $this->instance->getClasses();
                 expect($classes)->toHaveLength(1);
@@ -77,6 +83,7 @@ describe('File', function () {
                         <banana/>
                     </file>
                 ');
+                assert($xml_element !== false);
                 allow(Utilities::class)->toReceive('::logWarning')->andReturn();
                 $this->closure = function () use ($xml_element) {
                     return File::fromXML($xml_element, 'package_name');
@@ -93,7 +100,7 @@ describe('File', function () {
         });
     });
     describe('merge', function () {
-        describe('Receives a second File instance to merge into this one.', function () {
+        context('Receives a second File instance to merge into this one.', function () {
             beforeEach(function () {
                 $xml_element = simplexml_load_string('
                     <file name="/src/Example/Namespace/Class.php">
@@ -106,6 +113,7 @@ describe('File', function () {
                         <metrics foo="bar" baz="fred"/>
                     </file>
                 ');
+                assert($xml_element !== false);
                 $this->instance = File::fromXML($xml_element, 'package_name');
 
                 $xml_element = simplexml_load_string('
@@ -117,6 +125,7 @@ describe('File', function () {
                         <metrics foo="barry" baz="freddy"/>
                     </file>
                 ');
+                assert($xml_element !== false);
                 $this->instance->merge(File::fromXML($xml_element, 'other_package_name'));
             });
 

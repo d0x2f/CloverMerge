@@ -5,9 +5,12 @@ namespace d0x2f\CloverMerge\Spec;
 use d0x2f\CloverMerge\ClassT;
 use d0x2f\CloverMerge\Metrics;
 
+/**
+ * @phan-closure-scope \Kahlan\Scope
+ */
 describe('ClassT', function () {
     describe('__construct', function () {
-        describe('Receives a namespace and metrics.', function () {
+        context('Receives a namespace and metrics.', function () {
             beforeEach(function () {
                 $this->metrics = new Metrics(new \Ds\Map([
                     'foo' => 'bar',
@@ -22,7 +25,7 @@ describe('ClassT', function () {
         });
     });
     describe('fromXML', function () {
-        describe('Receives an XML element.', function () {
+        context('Receives an XML element.', function () {
             beforeEach(function () {
                 $xml_element = simplexml_load_string(
                     '<?xml version="1.0" encoding="UTF-8"?>
@@ -30,6 +33,7 @@ describe('ClassT', function () {
                         <metrics foo="bar" baz="fred" />
                     </class>'
                 );
+                assert($xml_element !== false);
                 $this->instance = ClassT::fromXML($xml_element);
             });
 

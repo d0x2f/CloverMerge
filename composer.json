@@ -27,7 +27,7 @@
     },
     "scripts": {
         "test": "./vendor/bin/kahlan",
-        "phan": "./vendor/bin/phan",
+        "phan": "env PHAN_DISABLE_XDEBUG_WARN=1 ./vendor/bin/phan",
         "sniff": "./vendor/bin/phpcs",
         "post-install-cmd": "\\SebastianFeldmann\\CaptainHook\\Composer\\Cmd::install"
     },

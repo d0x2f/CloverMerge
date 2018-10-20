@@ -7,9 +7,12 @@ use d0x2f\CloverMerge\File;
 use d0x2f\CloverMerge\Utilities;
 use d0x2f\CloverMerge\Metrics;
 
+/**
+ * @phan-closure-scope \Kahlan\Scope
+ */
 describe('Accumulator', function () {
     describe('parseAll', function () {
-        describe('Receives a vector of nice XML documents and merges in "inclusive" mode.', function () {
+        context('Receives a vector of nice XML documents and merges in "inclusive" mode.', function () {
             beforeEach(function () {
                 $this->accumulator = new Accumulator('inclusive');
                 $this->accumulator->parseAll(new \Ds\Vector([
@@ -46,7 +49,7 @@ describe('Accumulator', function () {
                 expect($lines->get(5)->getCount())->toBe(8);
             });
         });
-        describe('Receives a vector of nice XML documents and merges in "exclusive" mode.', function () {
+        context('Receives a vector of nice XML documents and merges in "exclusive" mode.', function () {
             beforeEach(function () {
                 $this->accumulator = new Accumulator('exclusive');
                 $this->accumulator->parseAll(new \Ds\Vector([
@@ -77,7 +80,7 @@ describe('Accumulator', function () {
                 expect($lines->get(4)->getCount())->toBe(6);
             });
         });
-        describe('Receives a vector of nice XML documents and merges in "additive" mode.', function () {
+        context('Receives a vector of nice XML documents and merges in "additive" mode.', function () {
             beforeEach(function () {
                 $this->accumulator = new Accumulator('additive');
                 $this->accumulator->parseAll(new \Ds\Vector([
@@ -111,7 +114,7 @@ describe('Accumulator', function () {
                 expect($lines->get(5)->getCount())->toBe(4);
             });
         });
-        describe('Receives a vector of XML documents with junk included.', function () {
+        context('Receives a vector of XML documents with junk included.', function () {
             beforeEach(function () {
                 allow(Utilities::class)->toReceive('::logWarning')->andReturn();
                 $this->accumulator = new Accumulator('inclusive');
@@ -121,6 +124,7 @@ describe('Accumulator', function () {
                 ]));
             });
 
+            /** @phan-suppress PhanUndeclaredProperty */
             it('ignores the junk and returns a map of files parsed from the input.', function () {
                 $result = $this->accumulator->getFiles();
 
@@ -147,7 +151,7 @@ describe('Accumulator', function () {
                 expect($lines->get(5)->getCount())->toBe(4);
             });
         });
-        describe('Receives a vector of XML documents with errors.', function () {
+        context('Receives a vector of XML documents with errors.', function () {
             beforeEach(function () {
                 allow(Utilities::class)->toReceive('::logWarning')->andReturn();
                 $this->accumulator = new Accumulator('inclusive');
