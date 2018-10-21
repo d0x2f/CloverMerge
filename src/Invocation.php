@@ -96,21 +96,22 @@ class Invocation
         $accumulator->parseAll($this->documents);
 
         // Output
-        $output = $accumulator->toXml();
-        $write_result = file_put_contents($this->output_path, $output);
+        [$xml, $metrics] = $accumulator->toXml();
+        $write_result = file_put_contents($this->output_path, $xml);
         if ($write_result === false) {
             throw new FileException("Unable to write to given output file.");
         }
 
         // Stats
-        $files_discovered = $accumulator->getFileCount();
-        [$covered, $total] = $accumulator->getCoverage();
-        if ($total === 0) {
+        $files_discovered = $metrics->file_count;
+        $element_count = $metrics->getElementCount();
+        $covered_element_count = $metrics->getCoveredElementCount();
+        if ($element_count === 0) {
             $coverage_percentage = 0;
         } else {
-            $coverage_percentage = 100 * $covered/$total;
+            $coverage_percentage = 100 * $covered_element_count/$element_count;
         }
         printf("Files Discovered: %d\n", $files_discovered);
-        printf("Final Coverage: %d/%d (%.2f%%)\n", $covered, $total, $coverage_percentage);
+        printf("Final Coverage: %d/%d (%.2f%%)\n", $covered_element_count, $element_count, $coverage_percentage);
     }
 }

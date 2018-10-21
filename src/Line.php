@@ -25,6 +25,7 @@ class Line
     /**
      * Initialise with a hit count.
      *
+     * @param \Ds\Map $properties Any other properties on the XML node.
      * @param integer $count
      */
     public function __construct(\Ds\Map $properties, int $count = 0)
@@ -50,6 +51,23 @@ class Line
             throw new ParseException('Unable to parse line, missing count attribute.');
         }
         return new Line($properties, (int)$properties->remove('count'));
+    }
+
+    /**
+     * Produce an XML representation.
+     *
+     * @param \DomDocument $document The parent document.
+     * @return \DOMElement
+     */
+    public function toXml(
+        \DomDocument $document
+    ) : \DOMElement {
+        $xml_line = $document->createElement('line');
+        foreach ($this->properties as $key => $value) {
+            $xml_line->setAttribute($key, $value);
+        }
+        $xml_line->setAttribute('count', (string)$this->count);
+        return $xml_line;
     }
 
     /**

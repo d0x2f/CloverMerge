@@ -5,7 +5,6 @@ namespace d0x2f\CloverMerge\Spec;
 use d0x2f\CloverMerge\Accumulator;
 use d0x2f\CloverMerge\File;
 use d0x2f\CloverMerge\Utilities;
-use d0x2f\CloverMerge\Metrics;
 
 /**
  * @phan-closure-scope \Kahlan\Scope
@@ -30,9 +29,6 @@ describe('Accumulator', function () {
                 expect($result->keys()->toArray())->toBe([
                     'test.php'
                 ]);
-
-                $metrics = $this->accumulator->getMetrics();
-                expect($metrics)->toBeAnInstanceOf(Metrics::class);
 
                 $file = $result->get('test.php');
                 expect($file)->toBeAnInstanceOf(File::class);

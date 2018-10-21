@@ -3,7 +3,6 @@
 namespace d0x2f\CloverMerge\Spec;
 
 use d0x2f\CloverMerge\ClassT;
-use d0x2f\CloverMerge\Metrics;
 
 /**
  * @phan-closure-scope \Kahlan\Scope
@@ -12,11 +11,11 @@ describe('ClassT', function () {
     describe('__construct', function () {
         context('Receives a namespace and metrics.', function () {
             beforeEach(function () {
-                $this->metrics = new Metrics(new \Ds\Map([
+                $properties = new \Ds\Map([
                     'foo' => 'bar',
                     'baz' => 'fred'
-                ]));
-                $this->instance = new ClassT('Example\Namespace', $this->metrics);
+                ]);
+                $this->instance = new ClassT($properties);
             });
 
             it('produces a valid instance.', function () {
@@ -29,9 +28,7 @@ describe('ClassT', function () {
             beforeEach(function () {
                 $xml_element = simplexml_load_string(
                     '<?xml version="1.0" encoding="UTF-8"?>
-                    <class name="Example\Namespace\Class" namespace="Example\Namespace">
-                        <metrics foo="bar" baz="fred" />
-                    </class>'
+                    <class name="Example\Namespace\Class" namespace="Example\Namespace" foo="bar" baz="fred"/>'
                 );
                 assert($xml_element !== false);
                 $this->instance = ClassT::fromXML($xml_element);
@@ -41,44 +38,28 @@ describe('ClassT', function () {
                 expect($this->instance)->toBeAnInstanceOf(ClassT::class);
             });
 
-            it('has the correct namespace set.', function () {
-                expect($this->instance->getNamespace())->toBe('Example\Namespace');
-            });
-
-            it('has the correct metrics set.', function () {
-                expect($this->instance->getMetrics()->getProperties()->toArray())->toBe([
+            it('has the correct properties set.', function () {
+                expect($this->instance->getProperties()->toArray())->toBe([
+                    'name' => 'Example\Namespace\Class',
+                    'namespace' => 'Example\Namespace',
                     'foo' => 'bar',
                     'baz' => 'fred'
                 ]);
             });
         });
     });
-    describe('getNamespace', function () {
+    describe('getProperties', function () {
         beforeEach(function () {
-            $this->metrics = new Metrics(new \Ds\Map([
+            $properties = new \Ds\Map([
                 'foo' => 'bar',
                 'baz' => 'fred'
-            ]));
-            $this->instance = new ClassT('Example\Namespace', $this->metrics);
-            $this->result = $this->instance->getNamespace();
+            ]);
+            $instance = new ClassT($properties);
+            $this->result = $instance->getProperties();
         });
 
         it('returns the properties map.', function () {
-            expect($this->result)->toBe('Example\Namespace');
-        });
-    });
-    describe('getMetrics', function () {
-        beforeEach(function () {
-            $this->metrics = new Metrics(new \Ds\Map([
-                'foo' => 'bar',
-                'baz' => 'fred'
-            ]));
-            $this->instance = new ClassT('Example\Namespace', $this->metrics);
-            $this->result = $this->instance->getMetrics();
-        });
-
-        it('returns the properties map.', function () {
-            expect($this->result->getProperties()->toArray())->toBe([
+            expect($this->result->toArray())->toBe([
                 'foo' => 'bar',
                 'baz' => 'fred'
             ]);

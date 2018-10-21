@@ -7,30 +7,23 @@ namespace d0x2f\CloverMerge;
  */
 class ClassT
 {
-    /**
-     * Class namespace.
-     *
-     * @var string|null
-     */
-    private $namespace;
 
     /**
-     * Class metrics
+     * Other properties on the line.
+     * E.g. name, visibility, complexity, crap.
      *
-     * @var Metrics|null
+     * @var \Ds\Map $properties
      */
-    private $metrics;
+    private $properties;
 
     /**
      * Constructor.
      *
-     * @param string|null $namespace
-     * @param Metrics|null $metrics
+     * @param \Ds\Map $properties Any properties on the XML node.
      */
-    public function __construct(?string $namespace = null, ?Metrics $metrics = null)
+    public function __construct(\Ds\Map $properties)
     {
-        $this->namespace = $namespace;
-        $this->metrics = $metrics;
+        $this->properties = $properties;
     }
 
     /**
@@ -41,48 +34,36 @@ class ClassT
      */
     public static function fromXML(\SimpleXMLElement $xml) : ClassT
     {
-        $attributes = $xml->attributes();
-        $class = new ClassT($attributes['namespace'] ?? null);
-        $children = $xml->children();
-        foreach ($children as $child) {
-            $name = $child->getName();
-            if ($name === 'metrics') {
-                $class->mergeMetrics(Metrics::fromXml($child));
-            } else {
-                Utilities::logWarning("Ignoring unknown element: {$name}.");
-            }
+        $properties = new \Ds\Map($xml->attributes());
+        $properties->apply(function ($_, $value) {
+            return (string) $value;
+        });
+        return new ClassT($properties);
+    }
+
+    /**
+     * Produce an XML representation.
+     *
+     * @param \DomDocument $document The parent document.
+     * @return \DOMElement
+     */
+    public function toXml(
+        \DomDocument $document
+    ) : \DOMElement {
+        $xml_class = $document->createElement('class');
+        foreach ($this->properties as $key => $value) {
+            $xml_class->setAttribute($key, $value);
         }
-        return $class;
+        return $xml_class;
     }
 
     /**
-     * Set metrics.
+     * Get the properties.
      *
-     * @param Metrics $metrics
-     * @return void
+     * @return \Ds\Map
      */
-    public function mergeMetrics(Metrics $metrics) : void
+    public function getProperties() : \Ds\Map
     {
-        $this->metrics = $this->metrics ?? $metrics;
-    }
-
-    /**
-     * Get the namespace.
-     *
-     * @return string|null
-     */
-    public function getNamespace() : ?string
-    {
-        return $this->namespace;
-    }
-
-    /**
-     * Get the metrics.
-     *
-     * @return Metrics|null
-     */
-    public function getMetrics() : ?Metrics
-    {
-        return $this->metrics;
+        return $this->properties;
     }
 }

@@ -29,13 +29,6 @@ class File
     private $package_name;
 
     /**
-     * Metrics element.
-     *
-     * @var Metrics|null
-     */
-    private $metrics;
-
-    /**
      * Construct with the given package name.
      *
      * @param string|null $package_name
@@ -45,7 +38,6 @@ class File
         $this->classes = new \Ds\Map();
         $this->lines = new \Ds\Map();
         $this->package_name = $package_name;
-        $this->metrics = null;
     }
 
     /**
@@ -83,7 +75,7 @@ class File
             }
             $file->mergeClass($attributes['name'] ?? '', ClassT::fromXml($child));
         } elseif ($name === 'metrics') {
-            $file->mergeMetrics(Metrics::fromXml($child));
+            // Ignore input metrics, we'll compute our own.
         } elseif ($name === 'line') {
             if (!Utilities::xmlHasAttributes($child, ['num', 'count'])) {
                 Utilities::logWarning('Ignoring line with no num or count.');
@@ -96,16 +88,76 @@ class File
     }
 
     /**
-     * Get the covered and total lines count.
+     * Produce an XML element representing this file.
      *
-     * @return array{0:int,1:int}
+     * @param \DomDocument $xml_document The parent document.
+     * @param string $name The name of the file.
+     * @return array{0:\DOMElement,1:Metrics}
      */
-    public function getCoverage() : array
-    {
-        $covered = $this->lines->filter(function (int $_, Line $line) {
-            return $line->getCount() > 0;
-        })->count();
-        return [$covered, $this->lines->count()];
+    public function toXml(
+        \DomDocument $xml_document,
+        string $name
+    ) : array {
+        $xml_file = $xml_document->createElement('file');
+        $xml_file->setAttribute('name', $name);
+
+        // Metric counts
+        $statement_count = 0;
+        $covered_statement_count = 0;
+        $conditional_count = 0;
+        $covered_conditional_count = 0;
+        $method_count = 0;
+        $covered_method_count = 0;
+        $class_count = $this->classes->count();
+
+        // Classes
+        foreach ($this->classes as $class) {
+            $xml_file->appendChild($class->toXml($xml_document));
+        }
+
+        // Lines
+        foreach ($this->lines as $line) {
+            $xml_file->appendChild($line->toXml($xml_document));
+            $properties = $line->getProperties();
+
+            $covered = $line->getCount() > 0;
+            $type = $properties['type'] ?? 'stmt';
+
+            if ($type === 'method') {
+                $method_count ++;
+                if ($covered) {
+                    $covered_method_count ++;
+                }
+            } elseif ($type === 'stmt') {
+                $statement_count ++;
+                if ($covered) {
+                    $covered_statement_count ++;
+                }
+            } elseif ($type === 'cond') {
+                $conditional_count ++;
+                if ($covered) {
+                    $covered_conditional_count ++;
+                }
+            } else {
+                Utilities::logWarning("Ignoring unexpected line type: {$type}.");
+            }
+        }
+
+        // Metrics
+        $metrics = new Metrics(
+            $statement_count,
+            $covered_statement_count,
+            $conditional_count,
+            $covered_conditional_count,
+            $method_count,
+            $covered_method_count,
+            $class_count,
+            1
+        );
+        $xml_file->appendChild($metrics->toFileXml($xml_document));
+
+        // Return a tuple of the XML node and the metrics to carry over.
+        return [$xml_file, $metrics];
     }
 
     /**
@@ -120,7 +172,6 @@ class File
     {
         $this->classes = $other->getClasses()->merge($this->classes);
         $this->package_name = $this->package_name ?? $other->package_name;
-        $this->metrics = $this->metrics ?? $other->metrics;
 
         $other_lines = $other->getLines();
 
@@ -166,17 +217,6 @@ class File
     }
 
     /**
-     * Set metrics if not already set.
-     *
-     * @param Metrics $metrics
-     * @return void
-     */
-    public function mergeMetrics(Metrics $metrics)
-    {
-        $this->metrics = $this->metrics ?? $metrics;
-    }
-
-    /**
      * Get the classes.
      *
      * @return \Ds\Map
@@ -204,15 +244,5 @@ class File
     public function getPackageName() : ?string
     {
         return $this->package_name;
-    }
-
-    /**
-     * Get the metrics.
-     *
-     * @return Metrics|null
-     */
-    public function getMetrics() : ?Metrics
-    {
-        return $this->metrics;
     }
 }

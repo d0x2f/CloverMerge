@@ -29,13 +29,6 @@ class Accumulator
     private $files;
 
     /**
-     * Document metrics.
-     *
-     * @var ?Metrics
-     */
-    private $metrics = null;
-
-    /**
      * If this accumulator is empty.
      *
      * @var bool
@@ -62,44 +55,6 @@ class Accumulator
     public function getFiles() : \Ds\Map
     {
         return $this->files;
-    }
-
-    /**
-     * Get the top level metrics object.
-     *
-     * @return Metrics|null
-     */
-    public function getMetrics() : ?Metrics
-    {
-        return $this->metrics;
-    }
-
-    /**
-     * Get the number of files discovered.
-     *
-     * @return integer
-     */
-    public function getFileCount() : int
-    {
-        return $this->files->count();
-    }
-
-    /**
-     * Sum coverage information.
-     *
-     * @return array{0:int,1:int}
-     */
-    public function getCoverage() : array
-    {
-        return $this->files->reduce(
-            function (array $carry, string $_, File $file) {
-                [$covered, $total] = $file->getCoverage();
-                $carry[0] += $covered;
-                $carry[1] += $total;
-                return $carry;
-            },
-            [0, 0]
-        );
     }
 
     /**
@@ -199,10 +154,7 @@ class Accumulator
         } elseif ($name === 'file') {
             $this->parseFile($element, $package_name);
         } elseif ($name === 'metrics') {
-            $metrics = Metrics::fromXml($element);
-            if (is_null($this->metrics)) {
-                $this->metrics = $metrics;
-            }
+            // Ignore input metrics, we'll compute our own.
         } else {
             Utilities::logWarning("Ignoring unexpected element: {$name}.");
         }
@@ -235,10 +187,11 @@ class Accumulator
 
     /**
      * Build an XML representation.
+     * Returns a tuple of the xml string and a metrics object.
      *
-     * @return string
+     * @return array{0:string,1:Metrics}
      */
-    public function toXml() : string
+    public function toXml() : array
     {
         // Sort files by name
         $this->files->ksort();
@@ -254,96 +207,39 @@ class Accumulator
         $xml_project->setAttribute('timestamp', $_SERVER['REQUEST_TIME']);
         $xml_coverage->appendChild($xml_project);
 
+        $project_metrics = new Metrics();
+
         $packages = new \Ds\Map();
 
-        foreach ($this->files as $name => $item) {
-            $xml_file = Accumulator::buildFile($xml_document, $name, $item);
-            $package_name = $item->getPackageName();
+        foreach ($this->files as $name => $file) {
+            [$xml_file, $file_metrics] = $file->toXml($xml_document, $name);
+            $project_metrics->merge($file_metrics);
+            $package_name = $file->getPackageName();
             if (is_null($package_name)) {
                 $xml_project->appendChild($xml_file);
             } elseif ($packages->hasKey($package_name)) {
-                $packages->get($package_name)->appendChild($xml_file);
+                $packages->get($package_name)[0]->appendChild($xml_file);
+                $packages->get($package_name)[1]->merge($file_metrics);
             } else {
                 $xml_package = $xml_document->createElement('package');
                 $xml_package->setAttribute('name', $package_name);
                 $xml_project->appendChild($xml_package);
                 $xml_package->appendChild($xml_file);
-                $packages->put($package_name, $xml_package);
+                $package_metrics = new Metrics();
+                $package_metrics->package_count = 1;
+                $package_metrics->merge($file_metrics);
+                $packages->put($package_name, [$xml_package, $package_metrics]);
             }
         }
 
-        if (!is_null($this->metrics)) {
-            $xml_project->appendChild(Accumulator::buildMetrics($xml_document, $this->metrics));
+        foreach ($packages as $package) {
+            $package_xml = $package[0];
+            $package_metrics = $package[1];
+            $package_xml->appendChild($package_metrics->toPackageXml($xml_document));
         }
 
-        return $xml_document->saveXML();
-    }
+        $xml_project->appendChild($project_metrics->toProjectXml($xml_document));
 
-    /**
-     * Build an xml representation of a file.
-     *
-     * @param \DomDocument $xml_document
-     * @param string $name
-     * @param File $file
-     * @return \DOMElement
-     */
-    private static function buildFile(
-        \DomDocument $xml_document,
-        string $name,
-        File $file
-    ) : \DOMElement {
-        $xml_file = $xml_document->createElement('file');
-        $xml_file->setAttribute('name', $name);
-
-        foreach ($file->getClasses() as $name => $class) {
-            $xml_class = $xml_document->createElement('class');
-            $xml_class->setAttribute('name', $name);
-            $namespace = $class->getNamespace();
-            if (!is_null($namespace)) {
-                $xml_class->setAttribute('namespace', $namespace);
-            }
-            $metrics = $class->getMetrics();
-            if (!is_null($metrics)) {
-                $xml_metrics = Accumulator::buildMetrics($xml_document, $metrics);
-                $xml_class->appendChild($xml_metrics);
-            }
-            $xml_file->appendChild($xml_class);
-        }
-
-        foreach ($file->getLines() as $number => $line) {
-            $xml_line = $xml_document->createElement('line');
-            $xml_line->setAttribute('num', $number);
-            foreach ($line->getProperties() as $name => $value) {
-                $xml_line->setAttribute($name, $value);
-            }
-            $xml_line->setAttribute('count', $line->getCount());
-            $xml_file->appendChild($xml_line);
-        }
-
-        $metrics = $file->getMetrics();
-        if (!is_null($metrics)) {
-            $xml_metrics = Accumulator::buildMetrics($xml_document, $metrics);
-            $xml_file->appendChild($xml_metrics);
-        }
-
-        return $xml_file;
-    }
-
-    /**
-     * Build an xml representation of a set of metrics.
-     *
-     * @param \DomDocument $xml_document
-     * @param Metrics $metrics
-     * @return \DOMElement
-     */
-    private static function buildMetrics(
-        \DomDocument $xml_document,
-        Metrics $metrics
-    ) : \DOMElement {
-        $xml_metrics = $xml_document->createElement('metrics');
-        foreach ($metrics->getProperties() as $name => $value) {
-            $xml_metrics->setAttribute($name, $value);
-        }
-        return $xml_metrics;
+        return [$xml_document->saveXML(), $project_metrics];
     }
 }

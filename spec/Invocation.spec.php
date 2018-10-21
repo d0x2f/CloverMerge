@@ -5,6 +5,7 @@ namespace d0x2f\CloverMerge\Spec;
 use d0x2f\CloverMerge\Invocation;
 use d0x2f\CloverMerge\Accumulator;
 use d0x2f\CloverMerge\Utilities;
+use d0x2f\CloverMerge\Metrics;
 
 /**
  * @phan-closure-scope \Kahlan\Scope
@@ -133,7 +134,7 @@ describe('Invocation', function () {
                     new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><coverage/>')
                 );
                 allow(Accumulator::class)->toReceive('parseAll')->andReturn();
-                allow(Accumulator::class)->toReceive('toXml')->andReturn(new \Ds\Map());
+                allow(Accumulator::class)->toReceive('toXml')->andReturn([new \Ds\Map(), new Metrics()]);
                 $this->invocation = new Invocation(['prog', '-o', 'test', 'path', 'path2']);
                 $this->closure = function () {
                     $this->invocation->execute();
