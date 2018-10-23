@@ -120,10 +120,73 @@ describe('Invocation', function () {
                     allow('file_put_contents')->toBeCalled();
                 });
                 it('writes to the output file.', function () {
+                    allow('printf')->toBeCalled();
                     expect('file_put_contents')->toBeCalled()->with(
                         __DIR__.'/../test_output/fixtures_result.xml'
                     )->once();
+                    $this->closure();
+                });
+
+                it('Prints the coverage stats.', function () {
                     expect($this->closure)->toEcho("Files Discovered: 4\nFinal Coverage: 17/24 (70.83%)\n");
+                });
+            });
+            context('With an unsatisfied minimum coverage threshold.', function () {
+                beforeEach(function () {
+                    allow(Utilities::class)->toReceive('::logWarning')->andReturn();
+                    allow('file_put_contents')->toBeCalled();
+
+                    $invocation = new Invocation([
+                        'prog',
+                        '-o', __DIR__.'/../test_output/fixtures_result.xml',
+                        '-e', '90.0',
+                        __DIR__.'/fixtures/file-without-package.xml'
+                    ]);
+                    $this->closure = function () use ($invocation) {
+                        return $invocation->execute();
+                    };
+                });
+
+                it('Returns false.', function () {
+                    allow('printf')->toBeCalled();
+                    expect($this->closure())->toBe(false);
+                });
+
+                it('Prints the coverage stats.', function () {
+                    expect($this->closure)->toEcho(
+                        "Files Discovered: 1\n" .
+                        "Final Coverage: 4/5 (80.00%)\n" .
+                        "Coverage is below required threshold (80.00% < 90.00%).\n"
+                    );
+                });
+            });
+            context('With a satisfied minimum coverage threshold.', function () {
+                beforeEach(function () {
+                    allow(Utilities::class)->toReceive('::logWarning')->andReturn();
+                    allow('file_put_contents')->toBeCalled();
+
+                    $invocation = new Invocation([
+                        'prog',
+                        '-o', __DIR__.'/../test_output/fixtures_result.xml',
+                        '-e', '50.0',
+                        __DIR__.'/fixtures/file-without-package.xml'
+                    ]);
+                    $this->closure = function () use ($invocation) {
+                        return $invocation->execute();
+                    };
+                });
+
+                it('Returns false.', function () {
+                    allow('printf')->toBeCalled();
+                    expect($this->closure())->toBe(true);
+                });
+
+                it('Prints the coverage stats.', function () {
+                    expect($this->closure)->toEcho(
+                        "Files Discovered: 1\n" .
+                        "Final Coverage: 4/5 (80.00%)\n" .
+                        "Coverage is above required threshold (80.00% > 50.00%).\n"
+                    );
                 });
             });
         });

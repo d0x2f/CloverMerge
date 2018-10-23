@@ -24,6 +24,13 @@ class Invocation
     private $merge_mode;
 
     /**
+     * Coverage success threshold.
+     *
+     * @var float
+     */
+    private $coverage_threshold;
+
+    /**
      * Parsed input XML documents.
      *
      * @var \Ds\Vector
@@ -41,6 +48,7 @@ class Invocation
         $cli = Cli::create()
             ->opt('output:o', 'output file path', true)
             ->opt('mode:m', 'merge mode: additive, exclusive or inclusive (default)', false)
+            ->opt('enforce:e', 'Exit with failure if final coverage is below the given threshold', false)
             ->arg('paths', 'input file paths', true);
 
         try {
@@ -51,6 +59,7 @@ class Invocation
 
         $this->output_path = $arguments->getOpt('output');
         $this->merge_mode = $arguments->getOpt('mode', 'inclusive');
+        $this->coverage_threshold = floatval($arguments->getOpt('enforce', '0'));
 
         if (!in_array($this->merge_mode, ['inclusive', 'exclusive', 'additive'])) {
             throw new ArgumentException('Merge option must be one of: additive, exclusive or inclusive.');
@@ -85,10 +94,10 @@ class Invocation
     /**
      * Execute the invocation.
      *
-     * @return void
+     * @return bool Success
      * @throws FileException
      */
-    public function execute() : void
+    public function execute() : bool
     {
         $accumulator = new Accumulator($this->merge_mode);
 
@@ -113,5 +122,22 @@ class Invocation
         }
         printf("Files Discovered: %d\n", $files_discovered);
         printf("Final Coverage: %d/%d (%.2f%%)\n", $covered_element_count, $element_count, $coverage_percentage);
+        $success = $coverage_percentage > $this->coverage_threshold;
+        if ($this->coverage_threshold > 0) {
+            if ($success) {
+                printf(
+                    "Coverage is above required threshold (%.2f%% > %.2f%%).\n",
+                    $coverage_percentage,
+                    $this->coverage_threshold
+                );
+            } else {
+                printf(
+                    "Coverage is below required threshold (%.2f%% < %.2f%%).\n",
+                    $coverage_percentage,
+                    $this->coverage_threshold
+                );
+            }
+        }
+        return $success;
     }
 }

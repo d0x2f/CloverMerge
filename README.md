@@ -30,9 +30,11 @@ $ docker pull d0x2f/clover-merge
 usage: clover-merge [<options>] [<args>]
 
 OPTIONS
-  --help, -?     Display this help.
-  --mode, -m     merge mode: additive, exclusive or inclusive (default)
-  --output, -o   output file path
+  --enforce, -e   Exit with failure if final coverage is below the given
+                  threshold
+  --help, -?      Display this help.
+  --mode, -m      merge mode: additive, exclusive or inclusive (default)
+  --output, -o    output file path
 
 ARGUMENTS
   paths   input file paths
