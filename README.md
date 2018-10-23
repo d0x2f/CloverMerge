@@ -12,7 +12,7 @@ I spent a weekend writing this so you don't have to.
 
 # Install
 
-## As a Composer Dependancy
+## As a Composer Dependency
 
 ```bash
 $ composer require d0x2f/clover-merge
@@ -48,7 +48,7 @@ ARGUMENTS
 
 # Example
 
-## As a Composer Dependancy
+## As a Composer Dependency
 
 ```bash
 $ ./vendor/bin/clover-merge -o combined.xml input1.xml input2.xml
