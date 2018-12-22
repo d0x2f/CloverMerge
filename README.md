@@ -10,18 +10,57 @@ Intended to be used in a build pipeline to merge clover output from multiple tes
 
 I spent a weekend writing this so you don't have to.
 
-# Install
+# Standalone
 
-## As a Composer Dependency
+## Install
+
+Requires composer.
+
+```bash
+$ git clone https://github.com/d0x2f/CloverMerge.git
+$ composer install
+```
+
+## Run
+
+```bash
+$ ./clover-merge -o combined.xml input1.xml input2.xml
+Files Discovered: 332
+Final Coverage: 14534/14558 (99.84%)
+```
+
+# As a Composer Dependency
+
+## Install
+
+In your project root directory:
 
 ```bash
 $ composer require d0x2f/clover-merge
 ```
 
-## As a Docker Image
+## Run
+
+```bash
+$ ./vendor/bin/clover-merge -o combined.xml input1.xml input2.xml
+Files Discovered: 332
+Final Coverage: 14534/14558 (99.84%)
+```
+
+# As a Docker Image
+
+## Install
 
 ```bash
 $ docker pull d0x2f/clover-merge
+```
+
+## Run
+
+```bash
+$ docker run --rm -v $(pwd):/build clover-merge -o /build/combined.xml /build/input1.xml /build/input2.xml
+Files Discovered: 332
+Final Coverage: 14534/14558 (99.84%)
 ```
 
 # Usage
@@ -45,21 +84,3 @@ ARGUMENTS
 * Additive - Lines must be present in the first input file for them to be included.
 * Exclusive - Lines must be present in all input files for them to be included.
 * Inclusive - Lines from all files are included.
-
-# Example
-
-## As a Composer Dependency
-
-```bash
-$ ./vendor/bin/clover-merge -o combined.xml input1.xml input2.xml
-Files Discovered: 332
-Final Coverage: 14534/14558 (99.84%)
-```
-
-## As a Docker Image
-
-```bash
-$ docker run --rm -v $(pwd):/build clover-merge -o /build/combined.xml /build/input1.xml /build/input2.xml
-Files Discovered: 332
-Final Coverage: 14534/14558 (99.84%)
-```
